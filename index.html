@@ -616,7 +616,7 @@
                         <img id="ppt-image" src="ppt_slide-01.png" style="width: 100%; height: auto; display: block;">
                     </div>
                     <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; margin-bottom: 20px; text-align: center;">
-                        <p style="font-size: 12px; color: #666;">第 <span id="current-slide">1</span> 页 / 60 页</p>
+                        <p style="font-size: 12px; color: #666;">第 <span id="current-slide">1</span> 页 / 9 页</p>
                     </div>
                     <div class="button-group">
                         <button class="btn btn-secondary" onclick="previousSlide()">← 上一页</button>
@@ -944,6 +944,10 @@
                 <!-- 老师仪表板 -->
                 <div id="teacher-dashboard" class="screen">
                     <div class="screen-title">课程管理</div>
+                    <div style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="switchTeacherScreen('teacher-courseware')">📊 课件管理</button>
+                        <button class="btn btn-secondary" onclick="switchTeacherScreen('teacher-class-detail')">📋 班级管理</button>
+                    </div>
                     <div class="course-list">
                         <div class="course-card" onclick="switchTeacherScreen('teacher-class-detail')">
                             <h3>AMC 8 基础班</h3>
@@ -957,6 +961,81 @@
                             <p>课程进度：5/10</p>
                             <span class="badge">进行中</span>
                         </div>
+                        <div class="course-card">
+                            <h3>AMC 10 基础班</h3>
+                            <p>班级人数：18人</p>
+                            <p>课程进度：2/12</p>
+                            <span class="badge">进行中</span>
+                        </div>
+                        <div class="course-card">
+                            <h3>AMC 12 冲刺班</h3>
+                            <p>班级人数：15人</p>
+                            <p>课程进度：6/12</p>
+                            <span class="badge">进行中</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 课件管理 - 第一级：课程列表 -->
+                <div id="teacher-courseware" class="screen">
+                    <div class="breadcrumb">
+                        <a onclick="switchTeacherScreen('teacher-dashboard')">← 返回课程管理</a>
+                    </div>
+                    <div class="screen-title">课件管理</div>
+                    <div class="course-list">
+                        <div class="course-card" onclick="showCoursewareLessons('AMC 8')">
+                            <div style="font-size: 36px; margin-bottom: 10px;">📐</div>
+                            <h3>AMC 8</h3>
+                            <p>共 10 节课</p>
+                            <p>已上传课件：10 份</p>
+                            <span class="badge">进行中</span>
+                        </div>
+                        <div class="course-card" onclick="showCoursewareLessons('AMC 10')">
+                            <div style="font-size: 36px; margin-bottom: 10px;">📏</div>
+                            <h3>AMC 10</h3>
+                            <p>共 12 节课</p>
+                            <p>已上传课件：8 份</p>
+                            <span class="badge">进行中</span>
+                        </div>
+                        <div class="course-card" onclick="showCoursewareLessons('AMC 12')">
+                            <div style="font-size: 36px; margin-bottom: 10px;">🔢</div>
+                            <h3>AMC 12</h3>
+                            <p>共 12 节课</p>
+                            <p>已上传课件：6 份</p>
+                            <span class="badge">进行中</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 课件管理 - 第二级：节课列表 -->
+                <div id="teacher-courseware-lessons" class="screen">
+                    <div class="breadcrumb">
+                        <a onclick="switchTeacherScreen('teacher-courseware')">← 返回课程列表</a>
+                    </div>
+                    <div class="screen-title" id="courseware-course-title">AMC 8 - 课件列表</div>
+                    <div class="course-outline" id="courseware-lesson-list">
+                        <!-- 动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 课件演示（老师端） -->
+                <div id="teacher-courseware-view" class="screen">
+                    <div class="breadcrumb">
+                        <a onclick="switchTeacherScreen('teacher-courseware-lessons')">← 返回节课列表</a>
+                    </div>
+                    <div class="screen-title" id="teacher-courseware-title">Lecture 01 - Series and Numerical Table</div>
+                    <div style="background: #fff3cd; padding: 12px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; color: #856404;">
+                        📌 教学模式：请在腾讯会议中共享屏幕，打开此课件进行授课
+                    </div>
+                    <div class="ppt-viewer" style="background: white; padding: 0; overflow: auto;">
+                        <img id="teacher-ppt-image" src="ppt_slide-01.png" style="width: 100%; height: auto; display: block;">
+                    </div>
+                    <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; margin-bottom: 20px; text-align: center;">
+                        <p style="font-size: 12px; color: #666;">第 <span id="teacher-current-slide">1</span> 页 / 60 页</p>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn btn-secondary" onclick="teacherPreviousSlide()">← 上一页</button>
+                        <button class="btn btn-secondary" onclick="teacherNextSlide()">下一页 →</button>
                     </div>
                 </div>
                 
@@ -1096,6 +1175,77 @@
         
         let currentSlide = 1;
         const totalSlides = 60;
+        
+        let teacherCurrentSlide = 1;
+        const teacherTotalSlides = 60;
+        
+        const coursewareLessons = {
+            'AMC 8': [
+                { title: '第一节课', name: 'Lecture 01 - Series and Numerical Table', hasFile: true },
+                { title: '第二节课', name: 'Lecture 02 - Ratio and Ratio Word Problems', hasFile: true },
+                { title: '第三节课', name: 'Lecture 03 - Percentage', hasFile: true },
+                { title: '第四节课', name: 'Lecture 04 - Geometry Basics', hasFile: true },
+                { title: '第五节课', name: 'Lecture 05 - Algebra Introduction', hasFile: true },
+            ],
+            'AMC 10': [
+                { title: '第一节课', name: 'Lecture 01 - Number Theory', hasFile: true },
+                { title: '第二节课', name: 'Lecture 02 - Combinatorics', hasFile: true },
+                { title: '第三节课', name: 'Lecture 03 - Probability', hasFile: false },
+                { title: '第四节课', name: 'Lecture 04 - Geometry Advanced', hasFile: false },
+            ],
+            'AMC 12': [
+                { title: '第一节课', name: 'Lecture 01 - Complex Numbers', hasFile: true },
+                { title: '第二节课', name: 'Lecture 02 - Trigonometry', hasFile: true },
+                { title: '第三节课', name: 'Lecture 03 - Logarithms', hasFile: false },
+            ]
+        };
+        
+        function showCoursewareLessons(courseName) {
+            document.getElementById('courseware-course-title').textContent = courseName + ' - 课件列表';
+            const lessons = coursewareLessons[courseName] || [];
+            const listEl = document.getElementById('courseware-lesson-list');
+            listEl.innerHTML = lessons.map((lesson, idx) => `
+                <div class="outline-item" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h4>📚 ${lesson.title}</h4>
+                        <p style="font-size: 12px; color: #999; margin-top: 4px;">${lesson.name}</p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        ${lesson.hasFile 
+                            ? `<button class="btn btn-primary" style="padding: 8px 16px; font-size: 12px;" onclick="openTeacherCourseware('${lesson.name}')">📊 打开课件</button>`
+                            : `<button class="btn btn-secondary" style="padding: 8px 16px; font-size: 12px;" disabled>暂无课件</button>`
+                        }
+                    </div>
+                </div>
+            `).join('');
+            switchTeacherScreen('teacher-courseware-lessons');
+        }
+        
+        function openTeacherCourseware(lessonName) {
+            document.getElementById('teacher-courseware-title').textContent = lessonName;
+            teacherCurrentSlide = 1;
+            document.getElementById('teacher-ppt-image').src = 'ppt_slide-01.png';
+            document.getElementById('teacher-current-slide').textContent = 1;
+            switchTeacherScreen('teacher-courseware-view');
+        }
+        
+        function teacherNextSlide() {
+            if (teacherCurrentSlide < teacherTotalSlides) {
+                teacherCurrentSlide++;
+                const slideNum = String(teacherCurrentSlide).padStart(2, '0');
+                document.getElementById('teacher-ppt-image').src = 'ppt_slide-' + slideNum + '.png';
+                document.getElementById('teacher-current-slide').textContent = teacherCurrentSlide;
+            }
+        }
+        
+        function teacherPreviousSlide() {
+            if (teacherCurrentSlide > 1) {
+                teacherCurrentSlide--;
+                const slideNum = String(teacherCurrentSlide).padStart(2, '0');
+                document.getElementById('teacher-ppt-image').src = 'ppt_slide-' + slideNum + '.png';
+                document.getElementById('teacher-current-slide').textContent = teacherCurrentSlide;
+            }
+        }
         
         function updateSlide() {
             const slideNum = String(currentSlide).padStart(2, '0');
