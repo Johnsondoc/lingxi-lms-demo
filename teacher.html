@@ -2480,11 +2480,14 @@ function clearCanvas2() { ctx2.clearRect(0,0,canvas2.width,canvas2.height); }
 function saveAnnotation2() { const l=document.createElement('a'); l.download='批注_Q4.png'; l.href=canvas2.toDataURL(); l.click(); showToast('批注已保存','success'); }
 
 // ===== CANVAS HELPERS =====
+// getPos: 返回 CSS 像素坐标（不乘 DPR）
+// resizeCanvas 用 ctx.scale(dpr,dpr) 后，绘制坐标就是 CSS 像素，无需再乘 scaleX/Y
 function getPos(canvas, e) {
   const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-  return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+  return {
+    x: (e.clientX - rect.left),
+    y: (e.clientY - rect.top)
+  };
 }
 
 function resizeCanvas(canvas, ctx) {
@@ -2493,15 +2496,11 @@ function resizeCanvas(canvas, ctx) {
   const rect = parent.getBoundingClientRect();
   if (rect.width > 0 && rect.height > 0) {
     const dpr = window.devicePixelRatio || 1;
-    // Save current drawing
-    let imgData = null;
-    try { imgData = ctx.getImageData(0, 0, canvas.width, canvas.height); } catch(e) {}
-    canvas.width = Math.round(rect.width * dpr);
+    // 设置物理像素尺寸
+    canvas.width  = Math.round(rect.width  * dpr);
     canvas.height = Math.round(rect.height * dpr);
-    // Scale context for HiDPI
+    // 缩放到 CSS 像素坐标系，之后所有绘制坐标直接用 CSS px
     ctx.scale(dpr, dpr);
-    // Restore drawing
-    if (imgData) { try { ctx.putImageData(imgData, 0, 0); } catch(e) {} }
   }
 }
 
