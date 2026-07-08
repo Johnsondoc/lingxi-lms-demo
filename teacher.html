@@ -363,16 +363,110 @@ input, select, textarea { font-family: var(--font); }
 .process-q { }
 .process-q-img-wrap {
   border: 1px solid var(--gray-200); border-radius: 8px; overflow: hidden;
-  margin-bottom: 12px; background: #fafafa; position: relative;
+  margin-bottom: 0; background: #fafafa; position: relative;
+  /* 不裁剪，完整展示图片高度 */
 }
 .process-q-img { width: 100%; display: block; }
 .process-q-placeholder {
-  height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;
   color: var(--gray-400); gap: 8px;
 }
 .process-q-placeholder-icon { font-size: 32px; }
 .process-q-placeholder-text { font-size: 13px; }
 .upload-btn-wrap { margin-bottom: 14px; }
+
+/* Slice photo display */
+.slice-photo-wrap {
+  border: 1px solid var(--gray-200); border-radius: 8px; background: #fffef7;
+  margin-bottom: 10px; overflow: hidden;
+  /* 完整显示，不隐藏内容，通过外层滚动处理 */
+}
+.slice-photo-canvas { width: 100%; display: block; }
+.slice-photo-toolbar {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: var(--gray-50); border-bottom: 1px solid var(--gray-200);
+  flex-wrap: wrap;
+}
+.slice-photo-label { font-size: 12px; font-weight: 500; color: var(--gray-600); }
+.slice-photo-note { font-size: 11px; color: var(--gray-400); margin-left: auto; }
+
+/* Error classification buttons (2nd level) */
+.error-level2 {
+  display: none; margin-top: 10px; padding: 12px 14px;
+  background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px;
+}
+.error-level2.show { display: block; }
+.error-level2-title { font-size: 12px; font-weight: 600; color: var(--warning); margin-bottom: 8px; }
+.error-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.error-btn {
+  padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer;
+  border: 1.5px solid var(--gray-300); background: #fff; color: var(--gray-700);
+  transition: all .15s; font-family: var(--font);
+}
+.error-btn:hover { border-color: var(--warning); color: var(--warning); background: #fff7ed; }
+.error-btn.active { border-color: var(--danger); background: var(--danger-light); color: var(--danger); }
+
+/* Error level 3: knowledge point tags */
+.error-level3 {
+  display: none; margin-top: 10px; padding: 12px 14px;
+  background: #fff1f2; border: 1px solid #fca5a5; border-radius: 10px;
+}
+.error-level3.show { display: block; }
+.error-level3-title { font-size: 12px; font-weight: 600; color: var(--danger); margin-bottom: 8px; }
+.kp-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer;
+  border: 1.5px solid var(--gray-300); background: #fff; color: var(--gray-700);
+  transition: all .15s; margin: 0 6px 6px 0;
+}
+.kp-tag:hover { border-color: var(--danger); color: var(--danger); }
+.kp-tag.active { border-color: var(--danger); background: var(--danger-light); color: var(--danger); font-weight: 600; }
+.kp-tag.active::before { content: '✓ '; }
+
+/* Correct/Wrong verdict buttons */
+.verdict-section {
+  display: flex; align-items: center; gap: 10px; margin-top: 14px; padding-top: 14px;
+  border-top: 1px solid var(--gray-100);
+}
+.verdict-label { font-size: 13px; color: var(--gray-600); font-weight: 500; }
+.verdict-btn {
+  padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600;
+  cursor: pointer; border: 2px solid transparent; transition: all .15s; font-family: var(--font);
+}
+.verdict-correct {
+  background: var(--success-light); color: var(--success); border-color: #86efac;
+}
+.verdict-correct:hover, .verdict-correct.active {
+  background: var(--success); color: #fff; border-color: var(--success);
+}
+.verdict-wrong {
+  background: var(--danger-light); color: var(--danger); border-color: #fca5a5;
+}
+.verdict-wrong:hover, .verdict-wrong.active {
+  background: var(--danger); color: #fff; border-color: var(--danger);
+}
+
+/* Original photo modal */
+.photo-modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.photo-modal.open { opacity: 1; pointer-events: all; }
+.photo-modal-inner {
+  position: relative; max-width: 90vw; max-height: 90vh;
+  background: #fff; border-radius: 12px; overflow: hidden;
+}
+.photo-modal-img { max-width: 90vw; max-height: 85vh; display: block; object-fit: contain; }
+.photo-modal-close {
+  position: absolute; top: 10px; right: 10px; width: 32px; height: 32px;
+  border-radius: 50%; background: rgba(0,0,0,.5); color: #fff; border: none;
+  font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.photo-modal-label {
+  padding: 10px 16px; background: var(--gray-800); color: #fff;
+  font-size: 12px; display: flex; align-items: center; justify-content: space-between;
+}
 
 /* Canvas annotation */
 .canvas-wrap {
@@ -903,6 +997,18 @@ input, select, textarea { font-family: var(--font); }
 </body>
 </html>
 
+<!-- ===== ORIGINAL PHOTO MODAL ===== -->
+<div class="photo-modal" id="photo-modal" onclick="closePhotoModal(event)">
+  <div class="photo-modal-inner">
+    <button class="photo-modal-close" onclick="closePhotoModal(null,true)">✕</button>
+    <canvas id="photo-modal-canvas" style="max-width:90vw;max-height:80vh;display:block"></canvas>
+    <div class="photo-modal-label">
+      <span id="photo-modal-title">原始照片</span>
+      <span style="color:rgba(255,255,255,.5)">点击空白处关闭</span>
+    </div>
+  </div>
+</div>
+
 <!-- ===== PAGE: HOMEWORK GRADING ===== -->
 <div class="page" id="page-homework">
   <div class="app-body" style="padding-top:var(--nav-h)">
@@ -950,7 +1056,9 @@ input, select, textarea { font-family: var(--font); }
         <div class="hw-content">
           <div class="hw-questions" id="hw-questions-area">
 
-            <!-- Q1: Multiple Choice (auto-graded) -->
+            <!-- ============================================================ -->
+            <!-- Q1: 选择题（含题目区+切片图+选项区+答题区） -->
+            <!-- ============================================================ -->
             <div class="hw-question-card">
               <div class="hw-question-header">
                 <div class="hw-q-num">1</div>
@@ -962,33 +1070,65 @@ input, select, textarea { font-family: var(--font); }
                 <div class="hw-q-score">6/6</div>
               </div>
               <div class="hw-question-body">
-                <p style="font-size:14px;color:var(--gray-700);margin-bottom:14px;line-height:1.7">
-                  If $x + y = 10$ and $xy = 21$, what is the value of $x^2 + y^2$?
-                </p>
-                <div class="mc-options">
-                  <div class="mc-option correct">
-                    <div class="mc-option-letter" style="border-color:#86efac;background:#f0fdf4;color:#16a34a">A</div>
-                    <span>58</span>
-                    <span style="margin-left:auto;color:var(--success);font-size:12px">✓ 正确答案</span>
+
+                <!-- 题目区 -->
+                <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:14px 16px;margin-bottom:14px">
+                  <div style="font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">📋 题目</div>
+                  <p style="font-size:14px;color:var(--gray-800);line-height:1.8">
+                    If <em>x</em> + <em>y</em> = 10 and <em>xy</em> = 21, what is the value of <em>x</em>² + <em>y</em>²?
+                  </p>
+                </div>
+
+                <!-- 切片图区（含题目+答题区，完整展示不裁剪） -->
+                <div style="margin-bottom:14px">
+                  <div class="slice-photo-toolbar">
+                    <span class="slice-photo-label">📷 AI 切片（含题目区 + 答题区）</span>
+                    <span style="font-size:11px;color:var(--gray-400)">Q1 · 第1题</span>
+                    <button class="btn btn-xs btn-outline" style="margin-left:auto" onclick="openPhotoModal('q1-original','第1题 · 原始照片')">🔍 查看原照片</button>
                   </div>
-                  <div class="mc-option student-pick">
-                    <div class="mc-option-letter" style="border-color:var(--primary);background:var(--primary-light);color:var(--primary)">A</div>
-                    <span>58</span>
-                    <span style="margin-left:auto;color:var(--primary);font-size:12px">学生选择 ✓</span>
+                  <div class="slice-photo-wrap">
+                    <canvas id="q1-slice-canvas" style="width:100%;display:block;background:#fffef7"></canvas>
                   </div>
-                  <div class="mc-option">
-                    <div class="mc-option-letter">B</div>
-                    <span>62</span>
-                  </div>
-                  <div class="mc-option">
-                    <div class="mc-option-letter">C</div>
-                    <span>79</span>
-                  </div>
-                  <div class="mc-option">
-                    <div class="mc-option-letter">D</div>
-                    <span>100</span>
+                  <div style="font-size:11px;color:var(--gray-400);padding:6px 12px;background:var(--gray-50);border-top:1px solid var(--gray-100);border-radius:0 0 8px 8px">
+                    💡 切片包含完整题目文字与学生答题区域，防止裁切错位
                   </div>
                 </div>
+
+                <!-- 选项区 -->
+                <div style="margin-bottom:14px">
+                  <div style="font-size:11px;font-weight:600;color:var(--gray-400);margin-bottom:8px">🔘 选项区（系统自动匹配）</div>
+                  <div class="mc-options">
+                    <div class="mc-option correct">
+                      <div class="mc-option-letter" style="border-color:#86efac;background:#f0fdf4;color:#16a34a">A</div>
+                      <span>58</span>
+                      <span style="margin-left:auto;color:var(--success);font-size:12px">✓ 正确答案</span>
+                    </div>
+                    <div class="mc-option student-pick">
+                      <div class="mc-option-letter" style="border-color:var(--primary);background:var(--primary-light);color:var(--primary)">A</div>
+                      <span>58</span>
+                      <span style="margin-left:auto;color:var(--primary);font-size:12px">✏ 学生选择 ✓</span>
+                    </div>
+                    <div class="mc-option">
+                      <div class="mc-option-letter">B</div>
+                      <span>62</span>
+                    </div>
+                    <div class="mc-option">
+                      <div class="mc-option-letter">C</div>
+                      <span>79</span>
+                    </div>
+                    <div class="mc-option">
+                      <div class="mc-option-letter">D</div>
+                      <span>100</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 答题区（AI识别结果） -->
+                <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px 14px;margin-bottom:12px">
+                  <div style="font-size:11px;font-weight:600;color:var(--success);margin-bottom:6px">✏ 答题区（AI识别）</div>
+                  <div style="font-size:13px;color:var(--gray-700)">学生圈选：<strong style="color:var(--success)">A</strong>（AI识别置信度 97%）</div>
+                </div>
+
                 <div class="mc-result">
                   <span class="mc-correct-icon">✅</span>
                   <span style="font-size:13px;color:var(--gray-700)">回答正确，得 <strong style="color:var(--success)">6</strong> 分</span>
@@ -996,7 +1136,9 @@ input, select, textarea { font-family: var(--font); }
               </div>
             </div>
 
-            <!-- Q2: Multiple Choice (wrong) -->
+            <!-- ============================================================ -->
+            <!-- Q2: 选择题（含题目区+切片图+选项区+答题区，答错） -->
+            <!-- ============================================================ -->
             <div class="hw-question-card">
               <div class="hw-question-header">
                 <div class="hw-q-num" style="background:var(--danger)">2</div>
@@ -1008,29 +1150,61 @@ input, select, textarea { font-family: var(--font); }
                 <div class="hw-q-score" style="color:var(--danger)">0/6</div>
               </div>
               <div class="hw-question-body">
-                <p style="font-size:14px;color:var(--gray-700);margin-bottom:14px;line-height:1.7">
-                  A system of equations: $2x + 3y = 12$ and $x - y = 1$. Find $x$.
-                </p>
-                <div class="mc-options">
-                  <div class="mc-option correct">
-                    <div class="mc-option-letter" style="border-color:#86efac;background:#f0fdf4;color:#16a34a">B</div>
-                    <span>3</span>
-                    <span style="margin-left:auto;color:var(--success);font-size:12px">✓ 正确答案</span>
+
+                <!-- 题目区 -->
+                <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:14px 16px;margin-bottom:14px">
+                  <div style="font-size:11px;font-weight:600;color:var(--gray-400);margin-bottom:8px">📋 题目</div>
+                  <p style="font-size:14px;color:var(--gray-800);line-height:1.8">
+                    A system of equations: 2<em>x</em> + 3<em>y</em> = 12 and <em>x</em> − <em>y</em> = 1. Find <em>x</em>.
+                  </p>
+                </div>
+
+                <!-- 切片图区（完整展示，不裁剪） -->
+                <div style="margin-bottom:14px">
+                  <div class="slice-photo-toolbar">
+                    <span class="slice-photo-label">📷 AI 切片（含题目区 + 答题区）</span>
+                    <span style="font-size:11px;color:var(--gray-400)">Q2 · 第2题</span>
+                    <button class="btn btn-xs btn-outline" style="margin-left:auto" onclick="openPhotoModal('q2-original','第2题 · 原始照片')">🔍 查看原照片</button>
                   </div>
-                  <div class="mc-option">
-                    <div class="mc-option-letter">A</div>
-                    <span>2</span>
+                  <div class="slice-photo-wrap">
+                    <canvas id="q2-slice-canvas" style="width:100%;display:block;background:#fffef7"></canvas>
                   </div>
-                  <div class="mc-option wrong" style="border-color:#fca5a5;background:#fff1f2">
-                    <div class="mc-option-letter" style="border-color:#fca5a5;background:#fff1f2;color:var(--danger)">C</div>
-                    <span>4</span>
-                    <span style="margin-left:auto;color:var(--danger);font-size:12px">学生选择 ✗</span>
-                  </div>
-                  <div class="mc-option">
-                    <div class="mc-option-letter">D</div>
-                    <span>5</span>
+                  <div style="font-size:11px;color:var(--gray-400);padding:6px 12px;background:var(--gray-50);border-top:1px solid var(--gray-100);border-radius:0 0 8px 8px">
+                    💡 切片包含完整题目文字与学生答题区域
                   </div>
                 </div>
+
+                <!-- 选项区 -->
+                <div style="margin-bottom:14px">
+                  <div style="font-size:11px;font-weight:600;color:var(--gray-400);margin-bottom:8px">🔘 选项区（系统自动匹配）</div>
+                  <div class="mc-options">
+                    <div class="mc-option correct">
+                      <div class="mc-option-letter" style="border-color:#86efac;background:#f0fdf4;color:#16a34a">B</div>
+                      <span>3</span>
+                      <span style="margin-left:auto;color:var(--success);font-size:12px">✓ 正确答案</span>
+                    </div>
+                    <div class="mc-option">
+                      <div class="mc-option-letter">A</div>
+                      <span>2</span>
+                    </div>
+                    <div class="mc-option wrong">
+                      <div class="mc-option-letter" style="border-color:#fca5a5;background:#fff1f2;color:var(--danger)">C</div>
+                      <span>4</span>
+                      <span style="margin-left:auto;color:var(--danger);font-size:12px">✏ 学生选择 ✗</span>
+                    </div>
+                    <div class="mc-option">
+                      <div class="mc-option-letter">D</div>
+                      <span>5</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 答题区（AI识别） -->
+                <div style="background:#fff1f2;border:1px solid #fca5a5;border-radius:8px;padding:12px 14px;margin-bottom:12px">
+                  <div style="font-size:11px;font-weight:600;color:var(--danger);margin-bottom:6px">✏ 答题区（AI识别）</div>
+                  <div style="font-size:13px;color:var(--gray-700)">学生圈选：<strong style="color:var(--danger)">C</strong>（AI识别置信度 94%）· 正确答案为 <strong style="color:var(--success)">B</strong></div>
+                </div>
+
                 <div class="mc-result">
                   <span class="mc-wrong-icon">❌</span>
                   <span style="font-size:13px;color:var(--gray-700)">回答错误，得 <strong style="color:var(--danger)">0</strong> 分</span>
@@ -1052,33 +1226,47 @@ input, select, textarea { font-family: var(--font); }
               </div>
             </div>
 
-            <!-- Q3: Process question with canvas annotation -->
+            <!-- ============================================================ -->
+            <!-- Q3: 推导题（切片全图+手写批注+三级错误分类） -->
+            <!-- ============================================================ -->
             <div class="hw-question-card" id="q3-card">
               <div class="hw-question-header">
                 <div class="hw-q-num" style="background:#f59e0b">3</div>
                 <div style="flex:1">
-                  <div class="hw-q-title">解答题 · 手写批改</div>
+                  <div class="hw-q-title">推导解答题 · 手写批改</div>
                   <div class="hw-q-type">满分 12 分 · 需老师手动批改</div>
                 </div>
                 <span class="badge badge-yellow" id="q3-status">待批改</span>
                 <div class="hw-q-score" id="q3-score-display">—/12</div>
               </div>
               <div class="hw-question-body">
-                <p style="font-size:14px;color:var(--gray-700);margin-bottom:14px;line-height:1.7">
-                  <strong>题目：</strong>解方程组 $\begin{cases} 3x + 2y = 16 \\ x - y = 2 \end{cases}$，并验证你的答案。（要求写出完整解题过程）
-                </p>
 
-                <!-- Student submission image -->
+                <!-- 题目区 -->
+                <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:14px 16px;margin-bottom:14px">
+                  <div style="font-size:11px;font-weight:600;color:var(--gray-400);margin-bottom:8px">📋 题目</div>
+                  <p style="font-size:14px;color:var(--gray-800);line-height:1.8">
+                    解方程组：<br>
+                    <span style="margin-left:20px;font-family:serif">{ 3x + 2y = 16</span><br>
+                    <span style="margin-left:20px;font-family:serif">{ x − y = 2</span><br>
+                    并验证你的答案。（要求写出完整解题过程）
+                  </p>
+                </div>
+
+                <!-- 切片图区（完整展示，不裁剪，含题目+答题区） -->
                 <div style="margin-bottom:14px">
-                  <div style="font-size:12px;font-weight:500;color:var(--gray-600);margin-bottom:8px">📷 学生提交的作答图片</div>
-                  <div class="process-q-img-wrap" id="student-work-wrap">
-                    <!-- Simulated student handwriting -->
-                    <canvas id="student-work-canvas" width="700" height="280" style="width:100%;display:block;background:#fffef7;border-radius:0"></canvas>
-                  </div>
-                  <div style="display:flex;gap:8px;margin-top:8px">
-                    <button class="btn btn-outline btn-sm" onclick="document.getElementById('upload-input').click()">📷 重新上传图片</button>
+                  <div class="slice-photo-toolbar">
+                    <span class="slice-photo-label">📷 AI 切片（含题目区 + 答题区，完整展示）</span>
+                    <span style="font-size:11px;color:var(--gray-400)">Q3 · 第3题</span>
+                    <button class="btn btn-xs btn-outline" style="margin-left:auto" onclick="openPhotoModal('q3-original','第3题 · 原始照片')">🔍 查看原照片</button>
+                    <button class="btn btn-xs btn-outline" onclick="document.getElementById('upload-input').click()">📤 重新上传</button>
                     <input type="file" id="upload-input" accept="image/*" style="display:none" onchange="handleUpload(event)">
-                    <span style="font-size:11px;color:var(--gray-400);align-self:center">支持 JPG/PNG，最大 10MB</span>
+                  </div>
+                  <!-- 完整展示，不隐藏上下内容，通过页面滚动查看 -->
+                  <div class="slice-photo-wrap" id="student-work-wrap">
+                    <canvas id="student-work-canvas" width="700" height="380" style="width:100%;display:block;background:#fffef7"></canvas>
+                  </div>
+                  <div style="font-size:11px;color:var(--gray-400);padding:6px 12px;background:var(--gray-50);border-top:1px solid var(--gray-100);border-radius:0 0 8px 8px">
+                    💡 切片完整展示题目区与答题区，防止 AI 裁切后对齐错位 · 如切片有误请点击"查看原照片"核对
                   </div>
                 </div>
 
@@ -1110,21 +1298,7 @@ input, select, textarea { font-family: var(--font); }
                   <div style="font-size:11px;color:var(--gray-400);margin-top:6px">💡 支持手写板压感 · 鼠标 · 触控笔（iPad）</div>
                 </div>
 
-                <!-- Tags -->
-                <div class="tag-section">
-                  <div class="tag-section-label">知识点标签（点击添加）</div>
-                  <div class="tag-list" id="q3-tags">
-                    <span class="tag active" onclick="toggleTag(this)">代数-方程组</span>
-                    <span class="tag" onclick="toggleTag(this)">消元法</span>
-                    <span class="tag" onclick="toggleTag(this)">代入法</span>
-                    <span class="tag" onclick="toggleTag(this)">验算步骤</span>
-                    <span class="tag" onclick="toggleTag(this)">书写规范</span>
-                    <span class="tag" onclick="toggleTag(this)">逻辑推理</span>
-                    <span class="tag-add" onclick="addCustomTag()">+ 自定义</span>
-                  </div>
-                </div>
-
-                <!-- AI suggestion -->
+                <!-- AI 批改建议 -->
                 <div class="ai-suggest-box">
                   <div class="ai-suggest-header">
                     <span class="ai-suggest-icon">🤖</span>
@@ -1144,7 +1318,47 @@ input, select, textarea { font-family: var(--font); }
                   </div>
                 </div>
 
-                <!-- Score input -->
+                <!-- ===== 正确/错误判断 + 三级错误分类 ===== -->
+                <div class="verdict-section">
+                  <span class="verdict-label">推导过程判断：</span>
+                  <button class="verdict-btn verdict-correct" id="q3-verdict-correct" onclick="setVerdict(3,'correct',this)">✓ 正确</button>
+                  <button class="verdict-btn verdict-wrong" id="q3-verdict-wrong" onclick="setVerdict(3,'wrong',this)">✗ 错误</button>
+                  <span style="font-size:12px;color:var(--gray-400);margin-left:8px" id="q3-verdict-hint">请判断学生推导过程是否正确</span>
+                </div>
+
+                <!-- 二级：错误类型 -->
+                <div class="error-level2" id="q3-error-level2">
+                  <div class="error-level2-title">⚠ 错误类型（可多选）</div>
+                  <div class="error-btns">
+                    <button class="error-btn" id="q3-err-knowledge" onclick="selectErrorType(3,'knowledge',this)">📚 知识点问题</button>
+                    <button class="error-btn" id="q3-err-careless" onclick="selectErrorType(3,'careless',this)">✏ 粗心问题</button>
+                    <button class="error-btn" id="q3-err-logic" onclick="selectErrorType(3,'logic',this)">🔗 推导逻辑问题</button>
+                    <button class="error-btn" id="q3-err-calc" onclick="selectErrorType(3,'calc',this)">🔢 运算失误</button>
+                    <button class="error-btn" id="q3-err-format" onclick="selectErrorType(3,'format',this)">📝 书写不规范</button>
+                    <button class="error-btn" id="q3-err-incomplete" onclick="selectErrorType(3,'incomplete',this)">⏸ 解题不完整</button>
+                  </div>
+                </div>
+
+                <!-- 三级：知识点勾选（仅当选了"知识点问题"时展开） -->
+                <div class="error-level3" id="q3-error-level3">
+                  <div class="error-level3-title">📚 请勾选涉及的知识点（AI 自动抓取，可手动补充）</div>
+                  <div id="q3-kp-tags">
+                    <span class="kp-tag active" onclick="toggleKpTag(this)">代数-方程组</span>
+                    <span class="kp-tag" onclick="toggleKpTag(this)">消元法</span>
+                    <span class="kp-tag" onclick="toggleKpTag(this)">代入消元法</span>
+                    <span class="kp-tag" onclick="toggleKpTag(this)">加减消元法</span>
+                    <span class="kp-tag" onclick="toggleKpTag(this)">方程验证</span>
+                    <span class="kp-tag" onclick="toggleKpTag(this)">线性方程组</span>
+                    <span class="kp-tag" onclick="toggleKpTag(this)">整式运算</span>
+                    <span class="kp-tag" onclick="toggleKpTag(this)">解题步骤规范</span>
+                    <button class="btn btn-xs btn-outline" style="margin:0 0 6px 4px" onclick="addKpTag(3)">+ 自定义知识点</button>
+                  </div>
+                  <div style="margin-top:10px;padding:10px 12px;background:rgba(220,38,38,.05);border-radius:8px;font-size:12px;color:var(--gray-600)">
+                    <strong>已勾选知识点将自动：</strong>① 记录到学生知识点掌握档案 ② 纳入 AI 建议分析 ③ 用于下次作业题目推荐
+                  </div>
+                </div>
+
+                <!-- 分数输入 -->
                 <div class="score-section">
                   <span class="score-label">本题得分</span>
                   <input type="number" class="score-input" id="q3-score-input" min="0" max="12" value="9" oninput="updateScore(3,this.value,12)">
@@ -1154,25 +1368,49 @@ input, select, textarea { font-family: var(--font); }
               </div>
             </div>
 
-            <!-- Q4: Another process question -->
+            <!-- ============================================================ -->
+            <!-- Q4: 推导题（切片全图+手写批注+三级错误分类） -->
+            <!-- ============================================================ -->
             <div class="hw-question-card">
               <div class="hw-question-header">
                 <div class="hw-q-num" style="background:#8b5cf6">4</div>
                 <div style="flex:1">
-                  <div class="hw-q-title">解答题 · 手写批改</div>
+                  <div class="hw-q-title">推导解答题 · 手写批改</div>
                   <div class="hw-q-type">满分 12 分 · 需老师手动批改</div>
                 </div>
                 <span class="badge badge-yellow" id="q4-status">待批改</span>
                 <div class="hw-q-score" id="q4-score-display">—/12</div>
               </div>
               <div class="hw-question-body">
-                <p style="font-size:14px;color:var(--gray-700);margin-bottom:14px;line-height:1.7">
-                  <strong>题目：</strong>已知两个正整数之和为 35，乘积为 306，求这两个正整数。
-                </p>
-                <div class="process-q-img-wrap">
-                  <canvas id="student-work-canvas-2" width="700" height="220" style="width:100%;display:block;background:#fffef7"></canvas>
+
+                <!-- 题目区 -->
+                <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:14px 16px;margin-bottom:14px">
+                  <div style="font-size:11px;font-weight:600;color:var(--gray-400);margin-bottom:8px">📋 题目</div>
+                  <p style="font-size:14px;color:var(--gray-800);line-height:1.8">
+                    已知两个正整数之和为 35，乘积为 306，求这两个正整数。
+                  </p>
                 </div>
-                <div style="margin-top:12px">
+
+                <!-- 切片图区（完整展示） -->
+                <div style="margin-bottom:14px">
+                  <div class="slice-photo-toolbar">
+                    <span class="slice-photo-label">📷 AI 切片（含题目区 + 答题区，完整展示）</span>
+                    <span style="font-size:11px;color:var(--gray-400)">Q4 · 第4题</span>
+                    <button class="btn btn-xs btn-outline" style="margin-left:auto" onclick="openPhotoModal('q4-original','第4题 · 原始照片')">🔍 查看原照片</button>
+                    <button class="btn btn-xs btn-outline" onclick="document.getElementById('upload-input-2').click()">📤 重新上传</button>
+                    <input type="file" id="upload-input-2" accept="image/*" style="display:none" onchange="handleUpload2(event)">
+                  </div>
+                  <div class="slice-photo-wrap">
+                    <canvas id="student-work-canvas-2" width="700" height="320" style="width:100%;display:block;background:#fffef7"></canvas>
+                  </div>
+                  <div style="font-size:11px;color:var(--gray-400);padding:6px 12px;background:var(--gray-50);border-top:1px solid var(--gray-100);border-radius:0 0 8px 8px">
+                    💡 切片完整展示题目区与答题区
+                  </div>
+                </div>
+
+                <!-- 手写批注 Canvas -->
+                <div style="margin-bottom:14px">
+                  <div style="font-size:12px;font-weight:500;color:var(--gray-600);margin-bottom:8px">✏️ 手写批注区</div>
                   <div class="canvas-toolbar">
                     <button class="canvas-tool-btn active" onclick="setTool2('pen')">✏️</button>
                     <button class="canvas-tool-btn" onclick="setTool2('eraser')">⬜</button>
@@ -1180,6 +1418,7 @@ input, select, textarea { font-family: var(--font); }
                     <div class="canvas-color-btn active" style="background:#ef4444" onclick="setColor2('#ef4444',this)"></div>
                     <div class="canvas-color-btn" style="background:#3b82f6" onclick="setColor2('#3b82f6',this)"></div>
                     <div class="canvas-color-btn" style="background:#16a34a" onclick="setColor2('#16a34a',this)"></div>
+                    <div class="canvas-color-btn" style="background:#f59e0b" onclick="setColor2('#f59e0b',this)"></div>
                     <div class="canvas-divider"></div>
                     <button class="canvas-tool-btn" onclick="clearCanvas2()">🗑</button>
                     <button class="canvas-tool-btn" onclick="saveAnnotation2()">💾</button>
@@ -1188,16 +1427,47 @@ input, select, textarea { font-family: var(--font); }
                     <canvas id="annotation-canvas-2" width="700" height="260" style="width:100%;display:block;touch-action:none"></canvas>
                   </div>
                 </div>
-                <div class="tag-section">
-                  <div class="tag-section-label">知识点标签</div>
-                  <div class="tag-list">
-                    <span class="tag" onclick="toggleTag(this)">数论-整数</span>
-                    <span class="tag active" onclick="toggleTag(this)">韦达定理</span>
-                    <span class="tag" onclick="toggleTag(this)">因式分解</span>
-                    <span class="tag" onclick="toggleTag(this)">逆向思维</span>
-                    <span class="tag-add" onclick="addCustomTag()">+ 自定义</span>
+
+                <!-- 正确/错误判断 + 三级错误分类 -->
+                <div class="verdict-section">
+                  <span class="verdict-label">推导过程判断：</span>
+                  <button class="verdict-btn verdict-correct" id="q4-verdict-correct" onclick="setVerdict(4,'correct',this)">✓ 正确</button>
+                  <button class="verdict-btn verdict-wrong" id="q4-verdict-wrong" onclick="setVerdict(4,'wrong',this)">✗ 错误</button>
+                  <span style="font-size:12px;color:var(--gray-400);margin-left:8px" id="q4-verdict-hint">请判断学生推导过程是否正确</span>
+                </div>
+
+                <!-- 二级：错误类型 -->
+                <div class="error-level2" id="q4-error-level2">
+                  <div class="error-level2-title">⚠ 错误类型（可多选）</div>
+                  <div class="error-btns">
+                    <button class="error-btn" id="q4-err-knowledge" onclick="selectErrorType(4,'knowledge',this)">📚 知识点问题</button>
+                    <button class="error-btn" id="q4-err-careless" onclick="selectErrorType(4,'careless',this)">✏ 粗心问题</button>
+                    <button class="error-btn" id="q4-err-logic" onclick="selectErrorType(4,'logic',this)">🔗 推导逻辑问题</button>
+                    <button class="error-btn" id="q4-err-calc" onclick="selectErrorType(4,'calc',this)">🔢 运算失误</button>
+                    <button class="error-btn" id="q4-err-format" onclick="selectErrorType(4,'format',this)">📝 书写不规范</button>
+                    <button class="error-btn" id="q4-err-incomplete" onclick="selectErrorType(4,'incomplete',this)">⏸ 解题不完整</button>
                   </div>
                 </div>
+
+                <!-- 三级：知识点勾选 -->
+                <div class="error-level3" id="q4-error-level3">
+                  <div class="error-level3-title">📚 请勾选涉及的知识点（AI 自动抓取，可手动补充）</div>
+                  <div id="q4-kp-tags">
+                    <span class="kp-tag active" onclick="toggleKpTag(this)">数论-整数</span>
+                    <span class="kp-tag active" onclick="toggleKpTag(this)">韦达定理</span>
+                    <span class="kp-tag" onclick="toggleKpTag(this)">因式分解</span>
+                    <span class="kp-tag" onclick="toggleKpTag(this)">二次方程</span>
+                    <span class="kp-tag" onclick="toggleKpTag(this)">判别式</span>
+                    <span class="kp-tag" onclick="toggleKpTag(this)">整数分解</span>
+                    <span class="kp-tag" onclick="toggleKpTag(this)">逆向思维</span>
+                    <span class="kp-tag" onclick="toggleKpTag(this)">验算方法</span>
+                    <button class="btn btn-xs btn-outline" style="margin:0 0 6px 4px" onclick="addKpTag(4)">+ 自定义知识点</button>
+                  </div>
+                  <div style="margin-top:10px;padding:10px 12px;background:rgba(220,38,38,.05);border-radius:8px;font-size:12px;color:var(--gray-600)">
+                    <strong>已勾选知识点将自动：</strong>① 记录到学生知识点掌握档案 ② 纳入 AI 建议分析 ③ 用于下次作业题目推荐
+                  </div>
+                </div>
+
                 <div class="score-section">
                   <span class="score-label">本题得分</span>
                   <input type="number" class="score-input" id="q4-score-input" min="0" max="12" value="" placeholder="—" oninput="updateScore(4,this.value,12)">
@@ -2344,12 +2614,242 @@ function addTaskQuestion() {
   showToast('题目已添加，请编辑题目内容');
 }
 
+// ===== VERDICT & ERROR CLASSIFICATION =====
+const verdictState = {}; // {qnum: 'correct'|'wrong'}  
+const errorTypes = {};   // {qnum: Set of error type keys}
+
+function setVerdict(qnum, verdict, btn) {
+  verdictState[qnum] = verdict;
+  // Update button styles
+  const cBtn = document.getElementById('q'+qnum+'-verdict-correct');
+  const wBtn = document.getElementById('q'+qnum+'-verdict-wrong');
+  if (cBtn) cBtn.classList.toggle('active', verdict==='correct');
+  if (wBtn) wBtn.classList.toggle('active', verdict==='wrong');
+
+  const hint = document.getElementById('q'+qnum+'-verdict-hint');
+  const level2 = document.getElementById('q'+qnum+'-error-level2');
+  const level3 = document.getElementById('q'+qnum+'-error-level3');
+
+  if (verdict === 'correct') {
+    if (hint) hint.textContent = '✓ 推导过程正确';
+    if (hint) hint.style.color = 'var(--success)';
+    if (level2) level2.classList.remove('show');
+    if (level3) level3.classList.remove('show');
+    // Auto-set full score suggestion
+    const scoreInput = document.getElementById('q'+qnum+'-score-input');
+    const max = qnum===3 ? 12 : 12;
+    if (scoreInput && !scoreInput.value) { scoreInput.value = max; updateScore(qnum, max, max); }
+    showToast('已标记为正确，推导过程满分', 'success');
+  } else {
+    if (hint) hint.textContent = '请选择错误类型';
+    if (hint) hint.style.color = 'var(--warning)';
+    if (level2) level2.classList.add('show');
+    if (level3) level3.classList.remove('show');
+    if (!errorTypes[qnum]) errorTypes[qnum] = new Set();
+  }
+}
+
+function selectErrorType(qnum, type, btn) {
+  if (!errorTypes[qnum]) errorTypes[qnum] = new Set();
+  if (errorTypes[qnum].has(type)) {
+    errorTypes[qnum].delete(type);
+    btn.classList.remove('active');
+  } else {
+    errorTypes[qnum].add(type);
+    btn.classList.add('active');
+  }
+
+  const level3 = document.getElementById('q'+qnum+'-error-level3');
+  if (type === 'knowledge') {
+    if (errorTypes[qnum].has('knowledge')) {
+      if (level3) level3.classList.add('show');
+    } else {
+      if (level3) level3.classList.remove('show');
+    }
+  }
+
+  // Update hint
+  const hint = document.getElementById('q'+qnum+'-verdict-hint');
+  const selected = [...(errorTypes[qnum]||[])].map(t => ({
+    knowledge:'知识点问题', careless:'粗心问题', logic:'推导逻辑问题',
+    calc:'运算失误', format:'书写不规范', incomplete:'解题不完整'
+  }[t]||t));
+  if (hint && selected.length > 0) {
+    hint.textContent = '已标记：' + selected.join(' · ');
+    hint.style.color = 'var(--danger)';
+  }
+}
+
+function toggleKpTag(el) {
+  el.classList.toggle('active');
+  const container = el.closest('[id$="-kp-tags"]');
+  if (!container) return;
+  const active = [...container.querySelectorAll('.kp-tag.active')].map(t => t.textContent.replace(/^✓ /,''));
+  if (active.length > 0) showToast('已勾选知识点：' + active.join('、'));
+}
+
+function addKpTag(qnum) {
+  const name = prompt('输入自定义知识点名称：');
+  if (!name) return;
+  const container = document.getElementById('q'+qnum+'-kp-tags');
+  if (!container) return;
+  const addBtn = container.querySelector('.btn-outline');
+  const tag = document.createElement('span');
+  tag.className = 'kp-tag active';
+  tag.textContent = name;
+  tag.onclick = () => toggleKpTag(tag);
+  container.insertBefore(tag, addBtn);
+  showToast('知识点「' + name + '」已添加并勾选');
+}
+
+// ===== SLICE CANVAS DRAWING =====
+function drawSliceCanvas(canvasId, lines, hasQuestion) {
+  const c = document.getElementById(canvasId);
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+
+  // Paper background
+  ctx.fillStyle = '#fffef7';
+  ctx.fillRect(0,0,W,H);
+
+  // Faint ruled lines
+  ctx.strokeStyle = '#e8e4d0';
+  ctx.lineWidth = 0.5;
+  for (let y = 32; y < H; y += 28) {
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+
+  // Question area label (top band)
+  if (hasQuestion) {
+    ctx.fillStyle = '#f0f9ff';
+    ctx.fillRect(0, 0, W, 56);
+    ctx.strokeStyle = '#bae6fd';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, 0, W, 56);
+    ctx.font = '11px "PingFang SC",sans-serif';
+    ctx.fillStyle = '#0284c7';
+    ctx.fillText('[ 题目区 ]', 10, 20);
+    ctx.font = '13px serif';
+    ctx.fillStyle = '#1e293b';
+    if (lines.question) ctx.fillText(lines.question, 10, 40);
+
+    // Answer area label
+    ctx.fillStyle = '#fefce8';
+    ctx.fillRect(0, 60, W, H-60);
+    ctx.strokeStyle = '#fde68a';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, 60, W, H-60);
+    ctx.font = '11px "PingFang SC",sans-serif';
+    ctx.fillStyle = '#92400e';
+    ctx.fillText('[ 答题区 ]', 10, 76);
+  }
+
+  // Student handwriting lines
+  ctx.font = '15px serif';
+  ctx.fillStyle = '#1e293b';
+  const startY = hasQuestion ? 96 : 32;
+  (lines.answer||[]).forEach((line, i) => {
+    ctx.fillText(line, 16, startY + i * 30);
+  });
+}
+
+// ===== ORIGINAL PHOTO MODAL =====
+const ORIGINAL_PHOTOS = {
+  'q1-original': { question: 'If x+y=10 and xy=21, find x²+y²?', answer: ['Student circled: A (58)', '', '(AI confidence: 97%)'] },
+  'q2-original': { question: '2x+3y=12, x-y=1. Find x.', answer: ['Student circled: C (4)', '', '(Correct answer: B = 3)', '(AI confidence: 94%)'] },
+  'q3-original': { question: '解方程组: {3x+2y=16, x-y=2}，并验证', answer: ['解：由 x-y=2 得 x=y+2','代入: 3(y+2)+2y=16','3y+6+2y=16','5y=10  y=2','x=y+2=4','∴ x=4, y=2','（未写验证步骤）'] },
+  'q4-original': { question: '两正整数之和35，乘积306，求这两个数', answer: ['设两数为a,b: a+b=35, ab=306','由韦达定理: t²-35t+306=0','Δ=35²-4×306=1225-1224=1','t=(35±1)/2','t₁=18, t₂=17','验证: 18+17=35✓, 18×17=306✓'] },
+};
+
+function openPhotoModal(photoId, title) {
+  const modal = document.getElementById('photo-modal');
+  const titleEl = document.getElementById('photo-modal-title');
+  const canvas = document.getElementById('photo-modal-canvas');
+  if (!modal || !canvas) return;
+
+  titleEl.textContent = title || '原始照片';
+  const data = ORIGINAL_PHOTOS[photoId] || { question: '原始题目', answer: ['（原始照片内容）'] };
+
+  // Draw full-page photo simulation
+  canvas.width = 600;
+  canvas.height = 480;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#fffef7';
+  ctx.fillRect(0,0,600,480);
+
+  // Paper texture lines
+  ctx.strokeStyle = '#e8e4d0'; ctx.lineWidth = 0.5;
+  for (let y=28; y<480; y+=28) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(600,y); ctx.stroke(); }
+
+  // Full photo label
+  ctx.fillStyle = '#1e3a8a'; ctx.fillRect(0,0,600,28);
+  ctx.font = 'bold 12px "PingFang SC",sans-serif'; ctx.fillStyle='#fff';
+  ctx.fillText('📷 原始照片（完整页面）· ' + title, 10, 19);
+
+  // Question
+  ctx.fillStyle = '#0284c7'; ctx.font = '11px "PingFang SC",sans-serif';
+  ctx.fillText('题目：', 10, 52);
+  ctx.fillStyle = '#1e293b'; ctx.font = '13px serif';
+  ctx.fillText(data.question, 10, 70);
+
+  // Divider
+  ctx.strokeStyle = '#fde68a'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0,88); ctx.lineTo(600,88); ctx.stroke();
+  ctx.fillStyle = '#92400e'; ctx.font = '11px "PingFang SC",sans-serif';
+  ctx.fillText('答题区：', 10, 104);
+
+  ctx.font = '14px serif'; ctx.fillStyle = '#1e293b';
+  (data.answer||[]).forEach((line, i) => ctx.fillText(line, 16, 124 + i*28));
+
+  // Red circle annotation (simulated teacher mark)
+  ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(80, 200, 18, 0, Math.PI*2); ctx.stroke();
+  ctx.fillStyle = '#ef4444'; ctx.font = 'bold 11px sans-serif';
+  ctx.fillText('?', 76, 205);
+
+  modal.classList.add('open');
+}
+
+function closePhotoModal(e, force) {
+  if (force || (e && e.target === document.getElementById('photo-modal'))) {
+    document.getElementById('photo-modal').classList.remove('open');
+  }
+}
+
+// Handle photo upload Q4
+function handleUpload2(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.getElementById('student-work-canvas-2');
+      const ctx = c.getContext('2d');
+      c.height = Math.round(c.width * img.height / img.width);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  showToast('图片上传成功', 'success');
+}
+
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', () => {
-  // Pre-draw student work after a short delay
   setTimeout(() => {
     drawStudentWork();
     drawStudentWork2();
-  }, 100);
+    // Draw slice canvases
+    drawSliceCanvas('q1-slice-canvas', {
+      question: 'If x+y=10 and xy=21, find x²+y²?  (A)58  (B)62  (C)79  (D)100',
+      answer: ['学生圈选答案：A  (58)', '', 'AI识别置信度: 97%']
+    }, true);
+    drawSliceCanvas('q2-slice-canvas', {
+      question: '2x+3y=12, x-y=1. Find x.  (A)2  (B)3  (C)4  (D)5',
+      answer: ['学生圈选答案：C  (4)  ← 错误', 'AI识别置信度: 94%', '正确答案应为: B (3)']
+    }, true);
+  }, 150);
 });
 </script>
