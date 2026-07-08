@@ -1,0 +1,2355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>凌犀 AI LMS · 老师端</title>
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --primary: #1a56db;
+  --primary-dark: #1e40af;
+  --primary-light: #dbeafe;
+  --success: #16a34a;
+  --success-light: #dcfce7;
+  --warning: #d97706;
+  --warning-light: #fef3c7;
+  --danger: #dc2626;
+  --danger-light: #fee2e2;
+  --purple: #7c3aed;
+  --purple-light: #ede9fe;
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
+  --nav-h: 56px;
+  --sidebar-w: 220px;
+  --radius: 12px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+  --shadow: 0 4px 16px rgba(0,0,0,.10);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.14);
+  --font: 'PingFang SC','Microsoft YaHei','Segoe UI',sans-serif;
+}
+html, body { height: 100%; font-family: var(--font); font-size: 14px; color: var(--gray-800); background: var(--gray-50); }
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: var(--font); }
+input, select, textarea { font-family: var(--font); }
+
+/* ===== PAGE ROUTER ===== */
+.page { display: none; }
+.page.active { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ===== LOGIN PAGE ===== */
+#page-login { flex-direction: row; min-height: 100vh; }
+.login-brand {
+  width: 44%; background: linear-gradient(135deg, #1e3a8a 0%, #1a56db 50%, #3b82f6 100%);
+  display: flex; flex-direction: column; justify-content: center; padding: 60px 56px;
+  position: relative; overflow: hidden;
+}
+.login-brand::before {
+  content: ''; position: absolute; top: -80px; left: -80px;
+  width: 360px; height: 360px; border-radius: 50%;
+  background: rgba(255,255,255,.06);
+}
+.login-brand::after {
+  content: ''; position: absolute; bottom: -120px; right: -60px;
+  width: 440px; height: 440px; border-radius: 50%;
+  background: rgba(255,255,255,.05);
+}
+.login-brand > * { position: relative; z-index: 1; }
+.brand-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 48px; }
+.brand-logo-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700; color: #fff;
+}
+.brand-logo-text h1 { font-size: 20px; color: #fff; font-weight: 700; }
+.brand-logo-text p { font-size: 12px; color: rgba(255,255,255,.7); margin-top: 2px; }
+.brand-headline { font-size: 30px; font-weight: 700; color: #fff; line-height: 1.4; margin-bottom: 12px; }
+.brand-sub { font-size: 14px; color: rgba(255,255,255,.75); margin-bottom: 40px; }
+.brand-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
+.brand-pill {
+  padding: 6px 16px; border-radius: 20px; font-size: 12px; color: #fff;
+  background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2);
+}
+.brand-illustration {
+  background: rgba(255,255,255,.1); border-radius: 12px; padding: 28px;
+  border: 1px solid rgba(255,255,255,.15);
+}
+.brand-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.brand-stat { text-align: center; }
+.brand-stat-num { font-size: 24px; font-weight: 700; color: #fff; }
+.brand-stat-label { font-size: 11px; color: rgba(255,255,255,.65); margin-top: 4px; }
+
+.login-form-wrap {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  background: #fff; padding: 40px;
+}
+.login-form-box { width: 100%; max-width: 420px; }
+.login-form-box h2 { font-size: 24px; font-weight: 700; color: var(--gray-800); margin-bottom: 6px; }
+.login-form-box p { font-size: 13px; color: var(--gray-400); margin-bottom: 28px; }
+.tab-switch {
+  display: flex; background: var(--gray-100); border-radius: 8px; padding: 4px; margin-bottom: 24px;
+}
+.tab-switch button {
+  flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 13px;
+  background: transparent; color: var(--gray-500); transition: all .2s;
+}
+.tab-switch button.active { background: #fff; color: var(--gray-800); font-weight: 600; box-shadow: var(--shadow-sm); }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: 12px; font-weight: 500; color: var(--gray-700); margin-bottom: 6px; }
+.form-group input {
+  width: 100%; padding: 11px 14px; border: 1.5px solid var(--gray-200); border-radius: 8px;
+  font-size: 14px; color: var(--gray-800); outline: none; transition: border-color .2s;
+  background: #fff;
+}
+.form-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,86,219,.1); }
+.form-group input::placeholder { color: var(--gray-300); }
+.form-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.form-check { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--gray-500); cursor: pointer; }
+.form-check input[type=checkbox] { accent-color: var(--primary); }
+.form-link { font-size: 12px; color: var(--primary); cursor: pointer; }
+.btn-login {
+  width: 100%; padding: 13px; border: none; border-radius: 10px;
+  background: var(--primary); color: #fff; font-size: 15px; font-weight: 600;
+  transition: background .2s, transform .1s; margin-bottom: 20px;
+}
+.btn-login:hover { background: var(--primary-dark); }
+.btn-login:active { transform: scale(.99); }
+.divider { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--gray-200); }
+.divider span { font-size: 12px; color: var(--gray-400); }
+.btn-sso {
+  width: 100%; padding: 11px; border: 1.5px solid var(--gray-200); border-radius: 10px;
+  background: #fff; color: var(--gray-700); font-size: 13px; transition: border-color .2s;
+  margin-bottom: 20px;
+}
+.btn-sso:hover { border-color: var(--primary); color: var(--primary); }
+.login-footer { font-size: 11px; color: var(--gray-400); text-align: center; }
+.login-footer a { color: var(--primary); }
+
+/* ===== MAIN LAYOUT (after login) ===== */
+.app-nav {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h);
+  background: #fff; border-bottom: 1px solid var(--gray-200);
+  display: flex; align-items: center; padding: 0 24px; z-index: 100;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.nav-logo { display: flex; align-items: center; gap: 8px; margin-right: 32px; }
+.nav-logo-icon {
+  width: 30px; height: 30px; border-radius: 7px; background: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #fff;
+}
+.nav-logo-text { font-size: 15px; font-weight: 700; color: var(--gray-800); }
+.nav-logo-badge { font-size: 11px; color: var(--gray-400); margin-left: 4px; }
+.nav-items { display: flex; align-items: center; gap: 4px; flex: 1; }
+.nav-item {
+  padding: 6px 14px; border-radius: 8px; font-size: 13px; color: var(--gray-500);
+  cursor: pointer; transition: all .15s; white-space: nowrap; border: none; background: none;
+  font-family: var(--font);
+}
+.nav-item:hover { background: var(--gray-100); color: var(--gray-800); }
+.nav-item.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+.nav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.nav-bell {
+  width: 32px; height: 32px; border-radius: 8px; background: var(--gray-100);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  position: relative; font-size: 15px; border: none;
+}
+.nav-bell-dot {
+  position: absolute; top: 4px; right: 4px; width: 8px; height: 8px;
+  border-radius: 50%; background: var(--danger); border: 2px solid #fff;
+}
+.nav-avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: #e0e7ff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; color: #3730a3; cursor: pointer;
+}
+.nav-name { font-size: 13px; color: var(--gray-700); font-weight: 500; }
+
+.app-body { padding-top: var(--nav-h); min-height: 100vh; }
+.app-content { padding: 24px; max-width: 1400px; margin: 0 auto; }
+
+/* ===== CARDS & COMMON ===== */
+.card { background: #fff; border-radius: var(--radius); border: 1px solid var(--gray-200); }
+.card-p { padding: 20px; }
+.section-title { font-size: 15px; font-weight: 600; color: var(--gray-800); margin-bottom: 16px; }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.link-more { font-size: 12px; color: var(--primary); cursor: pointer; }
+.badge {
+  display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 500;
+}
+.badge-blue { background: var(--primary-light); color: var(--primary); }
+.badge-green { background: var(--success-light); color: var(--success); }
+.badge-yellow { background: var(--warning-light); color: var(--warning); }
+.badge-red { background: var(--danger-light); color: var(--danger); }
+.badge-purple { background: var(--purple-light); color: var(--purple); }
+.badge-gray { background: var(--gray-100); color: var(--gray-500); }
+.btn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px;
+  border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer;
+  border: none; transition: all .15s; font-family: var(--font);
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-outline { background: #fff; color: var(--gray-700); border: 1px solid var(--gray-200); }
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-success { background: var(--success); color: #fff; }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+.btn-xs { padding: 3px 10px; font-size: 11px; border-radius: 6px; }
+
+/* ===== DASHBOARD PAGE ===== */
+.welcome-banner {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1a56db 60%, #3b82f6 100%);
+  border-radius: var(--radius); padding: 24px 28px; margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.welcome-text h2 { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.welcome-text p { font-size: 13px; color: rgba(255,255,255,.8); }
+.welcome-actions { display: flex; gap: 10px; flex-shrink: 0; }
+.welcome-btn {
+  padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 500;
+  background: rgba(255,255,255,.2); color: #fff; border: 1px solid rgba(255,255,255,.3);
+  cursor: pointer; transition: background .15s; font-family: var(--font);
+}
+.welcome-btn:hover { background: rgba(255,255,255,.3); }
+
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+.stat-card { border-radius: var(--radius); padding: 18px 20px; border: 1px solid var(--gray-200); }
+.stat-card-blue { background: #eff6ff; border-color: #bfdbfe; }
+.stat-card-green { background: #f0fdf4; border-color: #bbf7d0; }
+.stat-card-purple { background: #faf5ff; border-color: #e9d5ff; }
+.stat-card-orange { background: #fff7ed; border-color: #fed7aa; }
+.stat-label { font-size: 12px; color: var(--gray-500); margin-bottom: 8px; }
+.stat-value { font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+.stat-value-blue { color: var(--primary); }
+.stat-value-green { color: var(--success); }
+.stat-value-purple { color: var(--purple); }
+.stat-value-orange { color: var(--warning); }
+.stat-unit { font-size: 14px; font-weight: 400; }
+.stat-sub { font-size: 11px; color: var(--gray-400); margin-top: 6px; }
+.stat-ai-text { font-size: 12px; color: var(--gray-700); line-height: 1.6; }
+.stat-ai-btn { margin-top: 10px; }
+
+.classes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+.class-card { border-radius: var(--radius); border: 1px solid var(--gray-200); overflow: hidden; background: #fff; }
+.class-card-top { height: 6px; }
+.class-card-body { padding: 16px 18px; }
+.class-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.class-name { font-size: 15px; font-weight: 600; color: var(--gray-800); }
+.class-meta { font-size: 12px; color: var(--gray-400); margin-bottom: 12px; }
+.progress-row { margin-bottom: 8px; }
+.progress-bar-wrap { height: 6px; background: var(--gray-200); border-radius: 3px; margin-bottom: 4px; }
+.progress-bar { height: 100%; border-radius: 3px; }
+.progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--gray-400); }
+.class-actions { display: flex; gap: 8px; margin-top: 14px; }
+
+.bottom-grid { display: grid; grid-template-columns: 1fr 380px; gap: 16px; }
+.pending-list { display: flex; flex-direction: column; gap: 10px; }
+.pending-item {
+  display: flex; align-items: center; gap: 0; border-radius: 10px;
+  border: 1px solid var(--gray-200); overflow: hidden; background: #fff;
+}
+.pending-stripe { width: 4px; height: 64px; flex-shrink: 0; }
+.pending-content { flex: 1; padding: 12px 16px; }
+.pending-title { font-size: 13px; font-weight: 500; color: var(--gray-800); margin-bottom: 4px; }
+.pending-meta { font-size: 11px; color: var(--gray-400); }
+.pending-action { padding: 0 16px; }
+
+.ai-panel { border-radius: var(--radius); border: 1px solid var(--gray-200); background: var(--gray-50); padding: 18px; }
+.ai-panel-title { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 14px; display: flex; justify-content: space-between; }
+.ai-item { background: #fff; border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; border: 1px solid var(--gray-200); }
+.ai-item-title { font-size: 12px; font-weight: 500; color: var(--gray-800); margin-bottom: 4px; }
+.ai-item-desc { font-size: 11px; color: var(--gray-500); line-height: 1.6; }
+.ai-footer { font-size: 10px; color: var(--gray-400); text-align: center; padding-top: 8px; border-top: 1px solid var(--gray-200); margin-top: 4px; }
+
+/* ===== HOMEWORK GRADING PAGE ===== */
+#page-homework { flex-direction: column; }
+.hw-layout { display: flex; height: calc(100vh - var(--nav-h)); overflow: hidden; }
+
+/* Left sidebar: student list */
+.hw-sidebar {
+  width: 260px; flex-shrink: 0; background: #fff; border-right: 1px solid var(--gray-200);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.hw-sidebar-header { padding: 16px; border-bottom: 1px solid var(--gray-200); }
+.hw-sidebar-header h3 { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 10px; }
+.hw-filter { display: flex; gap: 6px; }
+.hw-filter-btn {
+  flex: 1; padding: 5px 8px; border-radius: 6px; font-size: 11px; font-weight: 500;
+  border: 1px solid var(--gray-200); background: #fff; color: var(--gray-500); cursor: pointer;
+  transition: all .15s; font-family: var(--font);
+}
+.hw-filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.hw-student-list { flex: 1; overflow-y: auto; padding: 8px; }
+.hw-student-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 10px; border-radius: 8px;
+  cursor: pointer; transition: background .15s; margin-bottom: 2px;
+}
+.hw-student-item:hover { background: var(--gray-50); }
+.hw-student-item.active { background: var(--primary-light); }
+.hw-student-avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--gray-200);
+  display: flex; align-items: center; justify-content: center; font-size: 12px;
+  font-weight: 600; color: var(--gray-600); flex-shrink: 0;
+}
+.hw-student-info { flex: 1; min-width: 0; }
+.hw-student-name { font-size: 13px; font-weight: 500; color: var(--gray-800); }
+.hw-student-status { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+.hw-student-badge { flex-shrink: 0; }
+
+/* Main grading area */
+.hw-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--gray-50); }
+.hw-topbar {
+  background: #fff; border-bottom: 1px solid var(--gray-200);
+  padding: 12px 20px; display: flex; align-items: center; gap: 16px; flex-shrink: 0;
+}
+.hw-topbar-select {
+  padding: 6px 12px; border: 1px solid var(--gray-200); border-radius: 8px;
+  font-size: 13px; color: var(--gray-700); background: #fff; outline: none; cursor: pointer;
+  font-family: var(--font);
+}
+.hw-topbar-divider { width: 1px; height: 20px; background: var(--gray-200); }
+.hw-topbar-info { font-size: 13px; color: var(--gray-500); }
+.hw-topbar-actions { margin-left: auto; display: flex; gap: 8px; }
+
+.hw-content { flex: 1; overflow-y: auto; padding: 20px; display: flex; gap: 16px; }
+
+/* Question list (left of main) */
+.hw-questions { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+.hw-question-card { background: #fff; border-radius: var(--radius); border: 1px solid var(--gray-200); overflow: hidden; }
+.hw-question-header {
+  padding: 14px 18px; border-bottom: 1px solid var(--gray-100);
+  display: flex; align-items: center; gap: 12px;
+}
+.hw-q-num {
+  width: 26px; height: 26px; border-radius: 50%; background: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.hw-q-type { font-size: 12px; color: var(--gray-400); }
+.hw-q-title { font-size: 14px; font-weight: 500; color: var(--gray-800); flex: 1; }
+.hw-q-score { font-size: 13px; font-weight: 600; color: var(--primary); }
+.hw-question-body { padding: 16px 18px; }
+
+/* Multiple choice auto-grade */
+.mc-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.mc-option {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  border-radius: 8px; border: 1.5px solid var(--gray-200); font-size: 13px;
+}
+.mc-option.correct { border-color: #86efac; background: #f0fdf4; }
+.mc-option.wrong { border-color: #fca5a5; background: #fff1f2; }
+.mc-option.student-pick { border-color: var(--primary); background: var(--primary-light); }
+.mc-option-letter {
+  width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--gray-300);
+  display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600;
+  flex-shrink: 0;
+}
+.mc-result { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.mc-correct-icon { color: var(--success); font-size: 16px; }
+.mc-wrong-icon { color: var(--danger); font-size: 16px; }
+
+/* Process question with canvas */
+.process-q { }
+.process-q-img-wrap {
+  border: 1px solid var(--gray-200); border-radius: 8px; overflow: hidden;
+  margin-bottom: 12px; background: #fafafa; position: relative;
+}
+.process-q-img { width: 100%; display: block; }
+.process-q-placeholder {
+  height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: var(--gray-400); gap: 8px;
+}
+.process-q-placeholder-icon { font-size: 32px; }
+.process-q-placeholder-text { font-size: 13px; }
+.upload-btn-wrap { margin-bottom: 14px; }
+
+/* Canvas annotation */
+.canvas-wrap {
+  position: relative; border: 2px solid var(--primary); border-radius: 8px; overflow: hidden;
+  background: #fff; cursor: crosshair;
+}
+.canvas-toolbar {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: var(--gray-800); border-radius: 8px 8px 0 0;
+}
+.canvas-tool-btn {
+  width: 30px; height: 30px; border-radius: 6px; border: none; background: transparent;
+  color: #fff; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.canvas-tool-btn:hover { background: rgba(255,255,255,.15); }
+.canvas-tool-btn.active { background: rgba(255,255,255,.25); }
+.canvas-divider { width: 1px; height: 20px; background: rgba(255,255,255,.2); }
+.canvas-color-btn {
+  width: 20px; height: 20px; border-radius: 50%; border: 2px solid transparent; cursor: pointer;
+}
+.canvas-color-btn.active { border-color: #fff; }
+.canvas-size-label { font-size: 11px; color: rgba(255,255,255,.6); }
+.canvas-size-input { width: 60px; accent-color: var(--primary); }
+.canvas-el { display: block; background: #fff; }
+.canvas-actions { display: flex; gap: 8px; margin-top: 10px; }
+
+/* Tags */
+.tag-section { margin-top: 14px; }
+.tag-section-label { font-size: 12px; font-weight: 500; color: var(--gray-600); margin-bottom: 8px; }
+.tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  padding: 4px 12px; border-radius: 20px; font-size: 11px; cursor: pointer;
+  border: 1px solid var(--gray-200); background: var(--gray-100); color: var(--gray-600);
+  transition: all .15s;
+}
+.tag.active { background: var(--primary-light); border-color: var(--primary); color: var(--primary); }
+.tag-add {
+  padding: 4px 12px; border-radius: 20px; font-size: 11px; cursor: pointer;
+  border: 1px dashed var(--gray-300); background: #fff; color: var(--gray-400);
+}
+
+/* Score input */
+.score-section { display: flex; align-items: center; gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--gray-100); }
+.score-label { font-size: 13px; color: var(--gray-600); }
+.score-input {
+  width: 70px; padding: 6px 10px; border: 1.5px solid var(--gray-200); border-radius: 8px;
+  font-size: 16px; font-weight: 600; text-align: center; color: var(--primary); outline: none;
+  font-family: var(--font);
+}
+.score-input:focus { border-color: var(--primary); }
+.score-max { font-size: 13px; color: var(--gray-400); }
+
+/* AI suggestion in grading */
+.ai-suggest-box {
+  background: linear-gradient(135deg, #eff6ff, #f0fdf4); border: 1px solid #bfdbfe;
+  border-radius: 10px; padding: 14px 16px; margin-top: 14px;
+}
+.ai-suggest-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.ai-suggest-icon { font-size: 16px; }
+.ai-suggest-title { font-size: 12px; font-weight: 600; color: var(--primary-dark); }
+.ai-suggest-body { font-size: 12px; color: var(--gray-700); line-height: 1.7; }
+.ai-suggest-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.ai-suggest-tag { padding: 2px 10px; border-radius: 20px; font-size: 11px; background: var(--primary-light); color: var(--primary); }
+
+/* Right panel: grading summary */
+.hw-right-panel { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; }
+.hw-summary-card { background: #fff; border-radius: var(--radius); border: 1px solid var(--gray-200); padding: 16px; }
+.hw-summary-title { font-size: 13px; font-weight: 600; color: var(--gray-800); margin-bottom: 14px; }
+.hw-summary-score { text-align: center; margin-bottom: 16px; }
+.hw-summary-score-num { font-size: 40px; font-weight: 700; color: var(--primary); }
+.hw-summary-score-total { font-size: 16px; color: var(--gray-400); }
+.hw-summary-score-label { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
+.hw-q-status-list { display: flex; flex-direction: column; gap: 6px; }
+.hw-q-status-item { display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
+.hw-q-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.hw-submit-btn { width: 100%; padding: 11px; border: none; border-radius: 10px; background: var(--success); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 14px; font-family: var(--font); }
+.hw-submit-btn:hover { background: #15803d; }
+
+.hw-comment-card { background: #fff; border-radius: var(--radius); border: 1px solid var(--gray-200); padding: 16px; }
+.hw-comment-label { font-size: 12px; font-weight: 500; color: var(--gray-600); margin-bottom: 8px; }
+.hw-comment-textarea {
+  width: 100%; height: 90px; padding: 10px; border: 1.5px solid var(--gray-200); border-radius: 8px;
+  font-size: 12px; color: var(--gray-700); resize: none; outline: none; font-family: var(--font);
+}
+.hw-comment-textarea:focus { border-color: var(--primary); }
+.hw-comment-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+/* ===== COURSEWARE PAGE ===== */
+.cw-layout { display: flex; height: calc(100vh - var(--nav-h)); overflow: hidden; }
+.cw-sidebar { width: 240px; flex-shrink: 0; background: #fff; border-right: 1px solid var(--gray-200); overflow-y: auto; }
+.cw-sidebar-header { padding: 16px; border-bottom: 1px solid var(--gray-200); }
+.cw-sidebar-header h3 { font-size: 14px; font-weight: 600; color: var(--gray-800); }
+.cw-tree { padding: 8px; }
+.cw-tree-group { margin-bottom: 4px; }
+.cw-tree-group-header {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px;
+  cursor: pointer; font-size: 13px; font-weight: 600; color: var(--gray-700);
+  transition: background .15s;
+}
+.cw-tree-group-header:hover { background: var(--gray-50); }
+.cw-tree-group-header.open { color: var(--primary); }
+.cw-tree-arrow { font-size: 10px; transition: transform .2s; }
+.cw-tree-arrow.open { transform: rotate(90deg); }
+.cw-tree-items { padding-left: 18px; }
+.cw-tree-item {
+  display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 8px;
+  cursor: pointer; font-size: 12px; color: var(--gray-600); transition: background .15s;
+}
+.cw-tree-item:hover { background: var(--gray-50); }
+.cw-tree-item.active { background: var(--primary-light); color: var(--primary); font-weight: 500; }
+
+.cw-main { flex: 1; overflow-y: auto; padding: 24px; background: var(--gray-50); }
+.cw-breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-400); margin-bottom: 20px; }
+.cw-breadcrumb-sep { color: var(--gray-300); }
+.cw-breadcrumb-current { color: var(--gray-700); font-weight: 500; }
+.cw-lesson-header { background: #fff; border-radius: var(--radius); border: 1px solid var(--gray-200); padding: 20px 24px; margin-bottom: 20px; }
+.cw-lesson-title { font-size: 18px; font-weight: 700; color: var(--gray-800); margin-bottom: 8px; }
+.cw-lesson-meta { display: flex; gap: 16px; font-size: 12px; color: var(--gray-400); }
+.cw-tabs { display: flex; gap: 4px; background: var(--gray-100); border-radius: 10px; padding: 4px; margin-bottom: 20px; width: fit-content; }
+.cw-tab {
+  padding: 7px 20px; border-radius: 8px; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all .15s; color: var(--gray-500); border: none; background: none; font-family: var(--font);
+}
+.cw-tab.active { background: #fff; color: var(--gray-800); box-shadow: var(--shadow-sm); }
+.cw-slides-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+.cw-slide-card {
+  border-radius: 10px; border: 2px solid var(--gray-200); overflow: hidden; cursor: pointer;
+  transition: all .15s; background: #fff;
+}
+.cw-slide-card:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(26,86,219,.1); }
+.cw-slide-card.active { border-color: var(--primary); }
+.cw-slide-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; background: var(--gray-100); display: block; }
+.cw-slide-thumb-placeholder { width: 100%; aspect-ratio: 16/9; background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--gray-400); }
+.cw-slide-label { padding: 8px 10px; font-size: 11px; color: var(--gray-600); }
+.cw-upload-zone {
+  border: 2px dashed var(--gray-300); border-radius: var(--radius); padding: 48px;
+  text-align: center; cursor: pointer; transition: border-color .15s; background: #fff;
+}
+.cw-upload-zone:hover { border-color: var(--primary); }
+.cw-upload-icon { font-size: 36px; margin-bottom: 12px; }
+.cw-upload-text { font-size: 14px; color: var(--gray-600); margin-bottom: 6px; }
+.cw-upload-sub { font-size: 12px; color: var(--gray-400); }
+
+/* ===== STUDENT DATA PAGE ===== */
+.sd-filters { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.sd-filter-select {
+  padding: 8px 14px; border: 1px solid var(--gray-200); border-radius: 8px;
+  font-size: 13px; color: var(--gray-700); background: #fff; outline: none; cursor: pointer;
+  font-family: var(--font);
+}
+.sd-table-wrap { background: #fff; border-radius: var(--radius); border: 1px solid var(--gray-200); overflow: hidden; margin-bottom: 20px; }
+.sd-table { width: 100%; border-collapse: collapse; }
+.sd-table th { padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--gray-500); background: var(--gray-50); border-bottom: 1px solid var(--gray-200); }
+.sd-table td { padding: 12px 16px; font-size: 13px; color: var(--gray-700); border-bottom: 1px solid var(--gray-100); }
+.sd-table tr:last-child td { border-bottom: none; }
+.sd-table tr:hover td { background: var(--gray-50); }
+.progress-mini { height: 4px; border-radius: 2px; background: var(--gray-200); width: 80px; display: inline-block; vertical-align: middle; overflow: hidden; }
+.progress-mini-fill { height: 100%; border-radius: 2px; }
+.sd-chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.sd-chart-card { background: #fff; border-radius: var(--radius); border: 1px solid var(--gray-200); padding: 20px; }
+.sd-chart-title { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 16px; }
+.bar-chart { display: flex; flex-direction: column; gap: 10px; }
+.bar-row { display: flex; align-items: center; gap: 10px; }
+.bar-label { font-size: 12px; color: var(--gray-600); width: 80px; flex-shrink: 0; text-align: right; }
+.bar-wrap { flex: 1; height: 18px; background: var(--gray-100); border-radius: 9px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 9px; transition: width .5s; }
+.bar-value { font-size: 12px; color: var(--gray-600); width: 36px; flex-shrink: 0; }
+
+/* ===== TASK DISPATCH PAGE ===== */
+.task-grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
+.task-form-card { background: #fff; border-radius: var(--radius); border: 1px solid var(--gray-200); padding: 24px; }
+.task-form-title { font-size: 16px; font-weight: 600; color: var(--gray-800); margin-bottom: 20px; }
+.task-form-group { margin-bottom: 18px; }
+.task-form-label { display: block; font-size: 13px; font-weight: 500; color: var(--gray-700); margin-bottom: 8px; }
+.task-form-input {
+  width: 100%; padding: 10px 14px; border: 1.5px solid var(--gray-200); border-radius: 8px;
+  font-size: 13px; color: var(--gray-800); outline: none; transition: border-color .2s; font-family: var(--font);
+}
+.task-form-input:focus { border-color: var(--primary); }
+.task-form-select {
+  width: 100%; padding: 10px 14px; border: 1.5px solid var(--gray-200); border-radius: 8px;
+  font-size: 13px; color: var(--gray-800); outline: none; background: #fff; cursor: pointer; font-family: var(--font);
+}
+.task-form-textarea {
+  width: 100%; height: 100px; padding: 10px 14px; border: 1.5px solid var(--gray-200); border-radius: 8px;
+  font-size: 13px; color: var(--gray-800); outline: none; resize: vertical; font-family: var(--font);
+}
+.task-form-textarea:focus { border-color: var(--primary); }
+.task-question-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.task-q-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--gray-50); border-radius: 8px; border: 1px solid var(--gray-200); }
+.task-q-item-text { flex: 1; font-size: 13px; color: var(--gray-700); }
+.task-q-item-type { font-size: 11px; color: var(--gray-400); }
+.task-q-remove { width: 20px; height: 20px; border-radius: 50%; background: var(--danger-light); color: var(--danger); border: none; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+.task-add-q { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1.5px dashed var(--gray-300); border-radius: 8px; cursor: pointer; color: var(--gray-400); font-size: 13px; transition: border-color .15s; background: #fff; width: 100%; font-family: var(--font); }
+.task-add-q:hover { border-color: var(--primary); color: var(--primary); }
+.task-history-card { background: #fff; border-radius: var(--radius); border: 1px solid var(--gray-200); padding: 20px; }
+.task-history-title { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 14px; }
+.task-history-item { padding: 12px 0; border-bottom: 1px solid var(--gray-100); }
+.task-history-item:last-child { border-bottom: none; }
+.task-history-name { font-size: 13px; font-weight: 500; color: var(--gray-800); margin-bottom: 4px; }
+.task-history-meta { font-size: 11px; color: var(--gray-400); }
+
+/* ===== AI SUGGESTIONS PAGE ===== */
+.ai-page-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.ai-big-card { background: #fff; border-radius: var(--radius); border: 1px solid var(--gray-200); padding: 20px; }
+.ai-big-title { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.ai-suggestion-item { padding: 14px; background: var(--gray-50); border-radius: 10px; margin-bottom: 10px; border-left: 3px solid var(--primary); }
+.ai-suggestion-item.warn { border-left-color: var(--warning); }
+.ai-suggestion-item.good { border-left-color: var(--success); }
+.ai-suggestion-item-title { font-size: 13px; font-weight: 500; color: var(--gray-800); margin-bottom: 6px; }
+.ai-suggestion-item-body { font-size: 12px; color: var(--gray-600); line-height: 1.7; }
+.ai-suggestion-item-action { margin-top: 10px; }
+.ai-knowledge-map { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.ai-km-item { padding: 12px; border-radius: 8px; text-align: center; }
+.ai-km-item-label { font-size: 12px; color: var(--gray-600); margin-bottom: 6px; }
+.ai-km-item-score { font-size: 20px; font-weight: 700; }
+.ai-km-item-bar { height: 4px; border-radius: 2px; background: var(--gray-200); margin-top: 6px; overflow: hidden; }
+.ai-km-item-fill { height: 100%; border-radius: 2px; }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200;
+  display: flex; align-items: center; justify-content: center; opacity: 0;
+  pointer-events: none; transition: opacity .2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-box { background: #fff; border-radius: 16px; padding: 28px; width: 480px; max-width: 90vw; box-shadow: var(--shadow-lg); transform: scale(.96); transition: transform .2s; }
+.modal-overlay.open .modal-box { transform: scale(1); }
+.modal-title { font-size: 16px; font-weight: 700; color: var(--gray-800); margin-bottom: 16px; }
+.modal-close { position: absolute; top: 16px; right: 16px; width: 28px; height: 28px; border-radius: 50%; background: var(--gray-100); border: none; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed; bottom: 28px; right: 28px; z-index: 300;
+  background: var(--gray-800); color: #fff; padding: 12px 20px; border-radius: 10px;
+  font-size: 13px; box-shadow: var(--shadow-lg); transform: translateY(20px);
+  opacity: 0; transition: all .3s; pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .classes-grid { grid-template-columns: repeat(2, 1fr); }
+  .bottom-grid { grid-template-columns: 1fr; }
+  .hw-right-panel { display: none; }
+  .sd-chart-grid { grid-template-columns: 1fr; }
+  .task-grid { grid-template-columns: 1fr; }
+  .ai-page-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  #page-login { flex-direction: column; }
+  .login-brand { width: 100%; padding: 40px 28px; min-height: 260px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .classes-grid { grid-template-columns: 1fr; }
+  .hw-sidebar { width: 200px; }
+  .cw-sidebar { width: 200px; }
+  .app-content { padding: 16px; }
+  .nav-items { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== PAGE: LOGIN ===== -->
+<div class="page active" id="page-login">
+  <div class="login-brand">
+    <div class="brand-logo">
+      <div class="brand-logo-icon">犀</div>
+      <div class="brand-logo-text">
+        <h1>凌犀 AI LMS</h1>
+        <p>X-NEW 犀牛国际教育</p>
+      </div>
+    </div>
+    <div class="brand-headline">AI 驱动的教学管理<br>让每一节课产生价值</div>
+    <div class="brand-sub">学 · 练 · 测 · 析 全流程闭环，数据驱动持续优化</div>
+    <div class="brand-pills">
+      <span class="brand-pill">📊 智能数据分析</span>
+      <span class="brand-pill">🤖 AI 批改建议</span>
+      <span class="brand-pill">📚 课件标准化</span>
+      <span class="brand-pill">👨‍👩‍👧 多端协同</span>
+    </div>
+    <div class="brand-illustration">
+      <div class="brand-stats">
+        <div class="brand-stat">
+          <div class="brand-stat-num">3</div>
+          <div class="brand-stat-label">活跃班级</div>
+        </div>
+        <div class="brand-stat">
+          <div class="brand-stat-num">55</div>
+          <div class="brand-stat-label">在读学生</div>
+        </div>
+        <div class="brand-stat">
+          <div class="brand-stat-num">76%</div>
+          <div class="brand-stat-label">作业完成率</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="login-form-wrap">
+    <div class="login-form-box">
+      <h2>老师端登录</h2>
+      <p>使用工号登录您的教学账号</p>
+      <div class="tab-switch">
+        <button class="active" id="tab-account">工号登录</button>
+        <button id="tab-phone">手机验证码</button>
+      </div>
+      <div id="login-account-form">
+        <div class="form-group">
+          <label>工号</label>
+          <input type="text" id="login-id" placeholder="请输入工号（如 T2024001）" value="T2024001">
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input type="password" id="login-pwd" placeholder="请输入密码" value="123456">
+        </div>
+        <div class="form-row">
+          <label class="form-check">
+            <input type="checkbox" checked> 记住登录状态（7天）
+          </label>
+          <span class="form-link">忘记密码？</span>
+        </div>
+      </div>
+      <div id="login-phone-form" style="display:none">
+        <div class="form-group">
+          <label>手机号</label>
+          <input type="text" placeholder="请输入手机号">
+        </div>
+        <div class="form-group">
+          <label>验证码</label>
+          <div style="display:flex;gap:10px">
+            <input type="text" placeholder="请输入验证码" style="flex:1">
+            <button class="btn btn-outline" onclick="showToast('验证码已发送至手机')">发送验证码</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn-login" onclick="doLogin()">登 录</button>
+      <div class="divider"><span>或</span></div>
+      <button class="btn-sso" onclick="showToast('正在跳转企业 SSO...')">🔐 企业 SSO 单点登录</button>
+      <div class="login-footer">登录即代表您同意 <a href="#">《用户协议》</a> 和 <a href="#">《隐私政策》</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NAV (shared) ===== -->
+<nav class="app-nav" id="app-nav" style="display:none">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">犀</div>
+    <span class="nav-logo-text">凌犀 LMS</span>
+    <span class="nav-logo-badge">老师端</span>
+  </div>
+  <div class="nav-items">
+    <button class="nav-item active" onclick="showPage('dashboard')">首页</button>
+    <button class="nav-item" onclick="showPage('homework')">作业批改</button>
+    <button class="nav-item" onclick="showPage('courseware')">课件管理</button>
+    <button class="nav-item" onclick="showPage('students')">学生数据</button>
+    <button class="nav-item" onclick="showPage('tasks')">任务下发</button>
+    <button class="nav-item" onclick="showPage('ai')">AI 建议</button>
+  </div>
+  <div class="nav-right">
+    <button class="nav-bell" onclick="showToast('暂无新通知')">🔔<span class="nav-bell-dot"></span></button>
+    <span class="nav-name">王老师</span>
+    <div class="nav-avatar" onclick="showToast('个人设置功能开发中')">王</div>
+  </div>
+</nav>
+
+<!-- ===== PAGE: DASHBOARD ===== -->
+<div class="page" id="page-dashboard">
+  <div class="app-body">
+    <div class="app-content">
+      <!-- Welcome Banner -->
+      <div class="welcome-banner">
+        <div class="welcome-text">
+          <h2>早上好，王老师 👋</h2>
+          <p>今天是 2026年7月2日（周三）· 您有 3 份作业待批改 · AMC 8 基础班今日 19:00 上课</p>
+        </div>
+        <div class="welcome-actions">
+          <button class="welcome-btn" onclick="showPage('courseware')">📂 打开课件</button>
+          <button class="welcome-btn" onclick="showPage('homework')">✏️ 批改作业</button>
+          <button class="welcome-btn" onclick="showPage('students')">📊 查看数据</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card stat-card-blue">
+          <div class="stat-label">本周待批改作业</div>
+          <div class="stat-value stat-value-blue">3 <span class="stat-unit">份</span></div>
+          <div><span class="badge badge-yellow">⚠ 待处理</span></div>
+        </div>
+        <div class="stat-card stat-card-green">
+          <div class="stat-label">今日上课班级</div>
+          <div class="stat-value stat-value-green">2 <span class="stat-unit">个班</span></div>
+          <div class="stat-sub">19:00 AMC8基础 · 20:30 AMC10强化</div>
+        </div>
+        <div class="stat-card stat-card-purple">
+          <div class="stat-label">本周平均作业完成率</div>
+          <div class="stat-value stat-value-purple">76 <span class="stat-unit">%</span></div>
+          <div><span class="badge badge-red">↓ 低于目标</span></div>
+        </div>
+        <div class="stat-card stat-card-orange">
+          <div class="stat-label">🤖 AI 教学建议</div>
+          <div class="stat-ai-text">📌 第3课"代数"正确率偏低(52%)，建议加强练习，下发补充题目</div>
+          <div class="stat-ai-btn"><button class="btn btn-xs btn-primary" onclick="showPage('ai')">查看建议 →</button></div>
+        </div>
+      </div>
+
+      <!-- Classes -->
+      <div class="section-header">
+        <div class="section-title" style="margin:0">我的班级</div>
+        <span class="link-more">查看全部 →</span>
+      </div>
+      <div class="classes-grid">
+        <!-- AMC8 基础 -->
+        <div class="class-card">
+          <div class="class-card-top" style="background:#3b82f6"></div>
+          <div class="class-card-body">
+            <div class="class-card-header">
+              <span class="class-name">AMC 8 基础班</span>
+              <span class="badge badge-blue">进行中</span>
+            </div>
+            <div class="class-meta">18 名学生 · 共 12 节课 · 已完成 4 节</div>
+            <div class="progress-row">
+              <div class="progress-bar-wrap"><div class="progress-bar" style="width:33%;background:#3b82f6"></div></div>
+              <div class="progress-labels"><span>课程进度 33%</span><span>作业完成率 78%</span></div>
+            </div>
+            <div class="class-actions">
+              <button class="btn btn-primary btn-sm" onclick="showPage('courseware')">打开课件</button>
+              <button class="btn btn-outline btn-sm" onclick="showPage('homework')">批改作业</button>
+              <button class="btn btn-outline btn-sm" onclick="showPage('students')">学生数据</button>
+            </div>
+          </div>
+        </div>
+        <!-- AMC8 强化 -->
+        <div class="class-card">
+          <div class="class-card-top" style="background:#8b5cf6"></div>
+          <div class="class-card-body">
+            <div class="class-card-header">
+              <span class="class-name">AMC 8 强化班</span>
+              <span class="badge badge-purple">进行中</span>
+            </div>
+            <div class="class-meta">22 名学生 · 共 12 节课 · 已完成 4 节</div>
+            <div class="progress-row">
+              <div class="progress-bar-wrap"><div class="progress-bar" style="width:33%;background:#8b5cf6"></div></div>
+              <div class="progress-labels"><span>课程进度 33%</span><span>作业完成率 82%</span></div>
+            </div>
+            <div class="class-actions">
+              <button class="btn btn-sm" style="background:#7c3aed;color:#fff" onclick="showPage('courseware')">打开课件</button>
+              <button class="btn btn-outline btn-sm" onclick="showPage('homework')">批改作业</button>
+              <button class="btn btn-outline btn-sm" onclick="showPage('students')">学生数据</button>
+            </div>
+          </div>
+        </div>
+        <!-- AMC10 冲刺 -->
+        <div class="class-card">
+          <div class="class-card-top" style="background:#f59e0b"></div>
+          <div class="class-card-body">
+            <div class="class-card-header">
+              <span class="class-name">AMC 10 冲刺班</span>
+              <span class="badge badge-yellow">即将开始</span>
+            </div>
+            <div class="class-meta">15 名学生 · 共 10 节课 · 开课日期 7月15日</div>
+            <div class="progress-row">
+              <div class="progress-bar-wrap"><div class="progress-bar" style="width:0%;background:#f59e0b"></div></div>
+              <div class="progress-labels"><span>课程进度 0%</span><span>待开课</span></div>
+            </div>
+            <div class="class-actions">
+              <button class="btn btn-sm" style="background:#d97706;color:#fff" onclick="showPage('courseware')">准备课件</button>
+              <button class="btn btn-outline btn-sm" onclick="showPage('tasks')">下发任务</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom: Pending + AI -->
+      <div class="bottom-grid">
+        <div>
+          <div class="section-title">待处理事项</div>
+          <div class="pending-list">
+            <div class="pending-item">
+              <div class="pending-stripe" style="background:var(--danger)"></div>
+              <div class="pending-content">
+                <div class="pending-title">AMC 8 基础班 · 第4课作业 待批改</div>
+                <div class="pending-meta">18 份提交 · 已批改 5 份 · 截止时间 今日 23:59</div>
+              </div>
+              <div class="pending-action"><button class="btn btn-danger btn-sm" onclick="showPage('homework')">立即批改</button></div>
+            </div>
+            <div class="pending-item">
+              <div class="pending-stripe" style="background:var(--warning)"></div>
+              <div class="pending-content">
+                <div class="pending-title">AMC 8 强化班 · 第4课作业 待批改</div>
+                <div class="pending-meta">22 份提交 · 已批改 12 份 · 截止时间 明日 23:59</div>
+              </div>
+              <div class="pending-action"><button class="btn btn-sm" style="background:var(--warning);color:#fff" onclick="showPage('homework')">继续批改</button></div>
+            </div>
+            <div class="pending-item">
+              <div class="pending-stripe" style="background:var(--primary)"></div>
+              <div class="pending-content">
+                <div class="pending-title">AMC 10 冲刺班 · 第1节课件 待上传</div>
+                <div class="pending-meta">开课日期 7月15日 · 建议提前3天上传</div>
+              </div>
+              <div class="pending-action"><button class="btn btn-outline btn-sm" onclick="showPage('courseware')">上传课件</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="ai-panel">
+          <div class="ai-panel-title">🤖 AI 教学建议 <span class="link-more" onclick="showPage('ai')">查看全部</span></div>
+          <div class="ai-item">
+            <div class="ai-item-title">📌 AMC8基础班 · 第3课代数正确率 52%</div>
+            <div class="ai-item-desc">建议：本周补发2道代数专项练习题，重点针对方程组解法。</div>
+          </div>
+          <div class="ai-item">
+            <div class="ai-item-title">✅ AMC8强化班 · 整体表现良好</div>
+            <div class="ai-item-desc">本周可适当提升难度，推荐 AMC10 难度题目，巩固几何模块。</div>
+          </div>
+          <div class="ai-footer">由 AI 分析生成 · 仅供参考</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+
+<!-- ===== PAGE: HOMEWORK GRADING ===== -->
+<div class="page" id="page-homework">
+  <div class="app-body" style="padding-top:var(--nav-h)">
+    <div class="hw-layout">
+      <!-- Left: Student List -->
+      <div class="hw-sidebar">
+        <div class="hw-sidebar-header">
+          <h3>学生列表</h3>
+          <div class="hw-filter">
+            <button class="hw-filter-btn active" onclick="filterStudents('all',this)">全部(18)</button>
+            <button class="hw-filter-btn" onclick="filterStudents('pending',this)">待批(13)</button>
+            <button class="hw-filter-btn" onclick="filterStudents('done',this)">已批(5)</button>
+          </div>
+        </div>
+        <div class="hw-student-list" id="student-list">
+          <!-- students injected by JS -->
+        </div>
+      </div>
+
+      <!-- Main: Grading Area -->
+      <div class="hw-main">
+        <!-- Top bar -->
+        <div class="hw-topbar">
+          <select class="hw-topbar-select" id="hw-class-select" onchange="updateHwClass()">
+            <option>AMC 8 基础班</option>
+            <option>AMC 8 强化班</option>
+            <option>AMC 10 冲刺班</option>
+          </select>
+          <div class="hw-topbar-divider"></div>
+          <select class="hw-topbar-select" id="hw-lesson-select">
+            <option>第4课 · 代数方程组（作业）</option>
+            <option>第3课 · 几何基础（作业）</option>
+            <option>第2课 · 数论入门（作业）</option>
+          </select>
+          <div class="hw-topbar-divider"></div>
+          <span class="hw-topbar-info" id="hw-student-name-display">当前：李明远</span>
+          <div class="hw-topbar-actions">
+            <button class="btn btn-outline btn-sm" onclick="prevStudent()">← 上一位</button>
+            <button class="btn btn-outline btn-sm" onclick="nextStudent()">下一位 →</button>
+            <button class="btn btn-primary btn-sm" onclick="submitGrade()">✓ 提交批改</button>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="hw-content">
+          <div class="hw-questions" id="hw-questions-area">
+
+            <!-- Q1: Multiple Choice (auto-graded) -->
+            <div class="hw-question-card">
+              <div class="hw-question-header">
+                <div class="hw-q-num">1</div>
+                <div style="flex:1">
+                  <div class="hw-q-title">选择题 · 自动批改</div>
+                  <div class="hw-q-type">满分 6 分 · 系统已自动判断</div>
+                </div>
+                <span class="badge badge-green">✓ 已自动批改</span>
+                <div class="hw-q-score">6/6</div>
+              </div>
+              <div class="hw-question-body">
+                <p style="font-size:14px;color:var(--gray-700);margin-bottom:14px;line-height:1.7">
+                  If $x + y = 10$ and $xy = 21$, what is the value of $x^2 + y^2$?
+                </p>
+                <div class="mc-options">
+                  <div class="mc-option correct">
+                    <div class="mc-option-letter" style="border-color:#86efac;background:#f0fdf4;color:#16a34a">A</div>
+                    <span>58</span>
+                    <span style="margin-left:auto;color:var(--success);font-size:12px">✓ 正确答案</span>
+                  </div>
+                  <div class="mc-option student-pick">
+                    <div class="mc-option-letter" style="border-color:var(--primary);background:var(--primary-light);color:var(--primary)">A</div>
+                    <span>58</span>
+                    <span style="margin-left:auto;color:var(--primary);font-size:12px">学生选择 ✓</span>
+                  </div>
+                  <div class="mc-option">
+                    <div class="mc-option-letter">B</div>
+                    <span>62</span>
+                  </div>
+                  <div class="mc-option">
+                    <div class="mc-option-letter">C</div>
+                    <span>79</span>
+                  </div>
+                  <div class="mc-option">
+                    <div class="mc-option-letter">D</div>
+                    <span>100</span>
+                  </div>
+                </div>
+                <div class="mc-result">
+                  <span class="mc-correct-icon">✅</span>
+                  <span style="font-size:13px;color:var(--gray-700)">回答正确，得 <strong style="color:var(--success)">6</strong> 分</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q2: Multiple Choice (wrong) -->
+            <div class="hw-question-card">
+              <div class="hw-question-header">
+                <div class="hw-q-num" style="background:var(--danger)">2</div>
+                <div style="flex:1">
+                  <div class="hw-q-title">选择题 · 自动批改</div>
+                  <div class="hw-q-type">满分 6 分 · 系统已自动判断</div>
+                </div>
+                <span class="badge badge-red">✗ 回答错误</span>
+                <div class="hw-q-score" style="color:var(--danger)">0/6</div>
+              </div>
+              <div class="hw-question-body">
+                <p style="font-size:14px;color:var(--gray-700);margin-bottom:14px;line-height:1.7">
+                  A system of equations: $2x + 3y = 12$ and $x - y = 1$. Find $x$.
+                </p>
+                <div class="mc-options">
+                  <div class="mc-option correct">
+                    <div class="mc-option-letter" style="border-color:#86efac;background:#f0fdf4;color:#16a34a">B</div>
+                    <span>3</span>
+                    <span style="margin-left:auto;color:var(--success);font-size:12px">✓ 正确答案</span>
+                  </div>
+                  <div class="mc-option">
+                    <div class="mc-option-letter">A</div>
+                    <span>2</span>
+                  </div>
+                  <div class="mc-option wrong" style="border-color:#fca5a5;background:#fff1f2">
+                    <div class="mc-option-letter" style="border-color:#fca5a5;background:#fff1f2;color:var(--danger)">C</div>
+                    <span>4</span>
+                    <span style="margin-left:auto;color:var(--danger);font-size:12px">学生选择 ✗</span>
+                  </div>
+                  <div class="mc-option">
+                    <div class="mc-option-letter">D</div>
+                    <span>5</span>
+                  </div>
+                </div>
+                <div class="mc-result">
+                  <span class="mc-wrong-icon">❌</span>
+                  <span style="font-size:13px;color:var(--gray-700)">回答错误，得 <strong style="color:var(--danger)">0</strong> 分</span>
+                </div>
+                <div class="ai-suggest-box">
+                  <div class="ai-suggest-header">
+                    <span class="ai-suggest-icon">🤖</span>
+                    <span class="ai-suggest-title">AI 错题分析</span>
+                  </div>
+                  <div class="ai-suggest-body">
+                    该学生在代入消元法上存在运算失误，选了 C(4) 而非正确答案 B(3)。建议在批改评语中提示：先用第二个方程表示 x = y+1，再代入第一个方程求解。
+                  </div>
+                  <div class="ai-suggest-tags">
+                    <span class="ai-suggest-tag">代数-方程组</span>
+                    <span class="ai-suggest-tag">消元法</span>
+                    <span class="ai-suggest-tag">运算失误</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q3: Process question with canvas annotation -->
+            <div class="hw-question-card" id="q3-card">
+              <div class="hw-question-header">
+                <div class="hw-q-num" style="background:#f59e0b">3</div>
+                <div style="flex:1">
+                  <div class="hw-q-title">解答题 · 手写批改</div>
+                  <div class="hw-q-type">满分 12 分 · 需老师手动批改</div>
+                </div>
+                <span class="badge badge-yellow" id="q3-status">待批改</span>
+                <div class="hw-q-score" id="q3-score-display">—/12</div>
+              </div>
+              <div class="hw-question-body">
+                <p style="font-size:14px;color:var(--gray-700);margin-bottom:14px;line-height:1.7">
+                  <strong>题目：</strong>解方程组 $\begin{cases} 3x + 2y = 16 \\ x - y = 2 \end{cases}$，并验证你的答案。（要求写出完整解题过程）
+                </p>
+
+                <!-- Student submission image -->
+                <div style="margin-bottom:14px">
+                  <div style="font-size:12px;font-weight:500;color:var(--gray-600);margin-bottom:8px">📷 学生提交的作答图片</div>
+                  <div class="process-q-img-wrap" id="student-work-wrap">
+                    <!-- Simulated student handwriting -->
+                    <canvas id="student-work-canvas" width="700" height="280" style="width:100%;display:block;background:#fffef7;border-radius:0"></canvas>
+                  </div>
+                  <div style="display:flex;gap:8px;margin-top:8px">
+                    <button class="btn btn-outline btn-sm" onclick="document.getElementById('upload-input').click()">📷 重新上传图片</button>
+                    <input type="file" id="upload-input" accept="image/*" style="display:none" onchange="handleUpload(event)">
+                    <span style="font-size:11px;color:var(--gray-400);align-self:center">支持 JPG/PNG，最大 10MB</span>
+                  </div>
+                </div>
+
+                <!-- Canvas annotation toolbar + canvas -->
+                <div style="margin-bottom:14px">
+                  <div style="font-size:12px;font-weight:500;color:var(--gray-600);margin-bottom:8px">✏️ 手写批注区（手写板 / 鼠标均可）</div>
+                  <div class="canvas-toolbar">
+                    <button class="canvas-tool-btn active" id="tool-pen" onclick="setTool('pen')" title="画笔">✏️</button>
+                    <button class="canvas-tool-btn" id="tool-eraser" onclick="setTool('eraser')" title="橡皮擦">⬜</button>
+                    <button class="canvas-tool-btn" id="tool-line" onclick="setTool('line')" title="直线">╱</button>
+                    <div class="canvas-divider"></div>
+                    <div class="canvas-color-btn active" style="background:#ef4444" onclick="setColor('#ef4444',this)" title="红色"></div>
+                    <div class="canvas-color-btn" style="background:#3b82f6" onclick="setColor('#3b82f6',this)" title="蓝色"></div>
+                    <div class="canvas-color-btn" style="background:#16a34a" onclick="setColor('#16a34a',this)" title="绿色"></div>
+                    <div class="canvas-color-btn" style="background:#f59e0b" onclick="setColor('#f59e0b',this)" title="橙色"></div>
+                    <div class="canvas-color-btn" style="background:#1e293b" onclick="setColor('#1e293b',this)" title="黑色"></div>
+                    <div class="canvas-divider"></div>
+                    <span class="canvas-size-label">粗细</span>
+                    <input type="range" class="canvas-size-input" id="brush-size" min="1" max="20" value="3" oninput="updateBrushSize(this.value)">
+                    <span style="font-size:11px;color:rgba(255,255,255,.7);min-width:20px" id="brush-size-label">3</span>
+                    <div class="canvas-divider"></div>
+                    <button class="canvas-tool-btn" onclick="undoCanvas()" title="撤销">↩</button>
+                    <button class="canvas-tool-btn" onclick="clearCanvas()" title="清除">🗑</button>
+                    <button class="canvas-tool-btn" onclick="saveAnnotation()" title="保存批注" style="background:rgba(255,255,255,.15)">💾</button>
+                  </div>
+                  <div class="canvas-wrap" id="canvas-wrap">
+                    <canvas id="annotation-canvas" width="700" height="320" style="width:100%;display:block;touch-action:none"></canvas>
+                  </div>
+                  <div style="font-size:11px;color:var(--gray-400);margin-top:6px">💡 支持手写板压感 · 鼠标 · 触控笔（iPad）</div>
+                </div>
+
+                <!-- Tags -->
+                <div class="tag-section">
+                  <div class="tag-section-label">知识点标签（点击添加）</div>
+                  <div class="tag-list" id="q3-tags">
+                    <span class="tag active" onclick="toggleTag(this)">代数-方程组</span>
+                    <span class="tag" onclick="toggleTag(this)">消元法</span>
+                    <span class="tag" onclick="toggleTag(this)">代入法</span>
+                    <span class="tag" onclick="toggleTag(this)">验算步骤</span>
+                    <span class="tag" onclick="toggleTag(this)">书写规范</span>
+                    <span class="tag" onclick="toggleTag(this)">逻辑推理</span>
+                    <span class="tag-add" onclick="addCustomTag()">+ 自定义</span>
+                  </div>
+                </div>
+
+                <!-- AI suggestion -->
+                <div class="ai-suggest-box">
+                  <div class="ai-suggest-header">
+                    <span class="ai-suggest-icon">🤖</span>
+                    <span class="ai-suggest-title">AI 批改建议</span>
+                    <span style="margin-left:auto;font-size:11px;color:var(--gray-400)">基于解题过程分析</span>
+                  </div>
+                  <div class="ai-suggest-body">
+                    <strong>解题过程识别：</strong>学生使用了代入法，步骤基本正确。<br>
+                    <strong>问题点：</strong>第3步代入计算时，3×4+2y=16 → 2y=4 → y=2，计算过程正确，但验证步骤缺失。<br>
+                    <strong>建议评分：</strong>过程分 9/10，验证分 0/2，建议总分 9/12。<br>
+                    <strong>批注建议：</strong>在验证步骤处标注"需补充验证"，并写明扣分原因。
+                  </div>
+                  <div class="ai-suggest-tags">
+                    <span class="ai-suggest-tag">代入法 ✓</span>
+                    <span class="ai-suggest-tag">缺少验证</span>
+                    <span class="ai-suggest-tag">建议 9/12</span>
+                  </div>
+                </div>
+
+                <!-- Score input -->
+                <div class="score-section">
+                  <span class="score-label">本题得分</span>
+                  <input type="number" class="score-input" id="q3-score-input" min="0" max="12" value="9" oninput="updateScore(3,this.value,12)">
+                  <span class="score-max">/ 12 分</span>
+                  <button class="btn btn-xs btn-success" onclick="acceptAiScore()">采纳 AI 建议 (9分)</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q4: Another process question -->
+            <div class="hw-question-card">
+              <div class="hw-question-header">
+                <div class="hw-q-num" style="background:#8b5cf6">4</div>
+                <div style="flex:1">
+                  <div class="hw-q-title">解答题 · 手写批改</div>
+                  <div class="hw-q-type">满分 12 分 · 需老师手动批改</div>
+                </div>
+                <span class="badge badge-yellow" id="q4-status">待批改</span>
+                <div class="hw-q-score" id="q4-score-display">—/12</div>
+              </div>
+              <div class="hw-question-body">
+                <p style="font-size:14px;color:var(--gray-700);margin-bottom:14px;line-height:1.7">
+                  <strong>题目：</strong>已知两个正整数之和为 35，乘积为 306，求这两个正整数。
+                </p>
+                <div class="process-q-img-wrap">
+                  <canvas id="student-work-canvas-2" width="700" height="220" style="width:100%;display:block;background:#fffef7"></canvas>
+                </div>
+                <div style="margin-top:12px">
+                  <div class="canvas-toolbar">
+                    <button class="canvas-tool-btn active" onclick="setTool2('pen')">✏️</button>
+                    <button class="canvas-tool-btn" onclick="setTool2('eraser')">⬜</button>
+                    <div class="canvas-divider"></div>
+                    <div class="canvas-color-btn active" style="background:#ef4444" onclick="setColor2('#ef4444',this)"></div>
+                    <div class="canvas-color-btn" style="background:#3b82f6" onclick="setColor2('#3b82f6',this)"></div>
+                    <div class="canvas-color-btn" style="background:#16a34a" onclick="setColor2('#16a34a',this)"></div>
+                    <div class="canvas-divider"></div>
+                    <button class="canvas-tool-btn" onclick="clearCanvas2()">🗑</button>
+                    <button class="canvas-tool-btn" onclick="saveAnnotation2()">💾</button>
+                  </div>
+                  <div class="canvas-wrap">
+                    <canvas id="annotation-canvas-2" width="700" height="260" style="width:100%;display:block;touch-action:none"></canvas>
+                  </div>
+                </div>
+                <div class="tag-section">
+                  <div class="tag-section-label">知识点标签</div>
+                  <div class="tag-list">
+                    <span class="tag" onclick="toggleTag(this)">数论-整数</span>
+                    <span class="tag active" onclick="toggleTag(this)">韦达定理</span>
+                    <span class="tag" onclick="toggleTag(this)">因式分解</span>
+                    <span class="tag" onclick="toggleTag(this)">逆向思维</span>
+                    <span class="tag-add" onclick="addCustomTag()">+ 自定义</span>
+                  </div>
+                </div>
+                <div class="score-section">
+                  <span class="score-label">本题得分</span>
+                  <input type="number" class="score-input" id="q4-score-input" min="0" max="12" value="" placeholder="—" oninput="updateScore(4,this.value,12)">
+                  <span class="score-max">/ 12 分</span>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- end hw-questions -->
+
+          <!-- Right panel: summary -->
+          <div class="hw-right-panel">
+            <div class="hw-summary-card">
+              <div class="hw-summary-title">批改进度</div>
+              <div class="hw-summary-score">
+                <div>
+                  <span class="hw-summary-score-num" id="total-score">15</span>
+                  <span class="hw-summary-score-total">/36</span>
+                </div>
+                <div class="hw-summary-score-label">当前总分</div>
+              </div>
+              <div class="hw-q-status-list">
+                <div class="hw-q-status-item">
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <div class="hw-q-status-dot" style="background:var(--success)"></div>
+                    <span>第1题（选择）</span>
+                  </div>
+                  <span style="color:var(--success);font-weight:600">6/6</span>
+                </div>
+                <div class="hw-q-status-item">
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <div class="hw-q-status-dot" style="background:var(--danger)"></div>
+                    <span>第2题（选择）</span>
+                  </div>
+                  <span style="color:var(--danger);font-weight:600">0/6</span>
+                </div>
+                <div class="hw-q-status-item">
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <div class="hw-q-status-dot" style="background:var(--warning)" id="q3-dot"></div>
+                    <span>第3题（解答）</span>
+                  </div>
+                  <span id="q3-score-summary" style="color:var(--warning);font-weight:600">9/12</span>
+                </div>
+                <div class="hw-q-status-item">
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <div class="hw-q-status-dot" style="background:var(--gray-300)" id="q4-dot"></div>
+                    <span>第4题（解答）</span>
+                  </div>
+                  <span id="q4-score-summary" style="color:var(--gray-400);font-weight:600">—/12</span>
+                </div>
+              </div>
+              <button class="hw-submit-btn" onclick="submitGrade()">✓ 完成批改并提交</button>
+            </div>
+
+            <div class="hw-comment-card">
+              <div class="hw-comment-label">总体评语</div>
+              <textarea class="hw-comment-textarea" id="teacher-comment" placeholder="输入对该学生本次作业的整体评语...">本次作业整体思路清晰，选择题第1题掌握较好。第2题方程组消元步骤出现运算失误，需加强练习。第3题解题过程正确但缺少验证步骤，请注意补充。</textarea>
+              <div class="hw-comment-actions">
+                <button class="btn btn-primary btn-sm" onclick="showToast('评语已保存','success')">保存评语</button>
+                <button class="btn btn-outline btn-sm" onclick="generateAiComment()">🤖 AI 生成评语</button>
+              </div>
+            </div>
+
+            <div class="hw-summary-card">
+              <div class="hw-summary-title" style="margin-bottom:10px">批改进度总览</div>
+              <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px">AMC8基础班 · 第4课作业</div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
+                <span>已批改</span><span style="font-weight:600;color:var(--success)">6/18</span>
+              </div>
+              <div class="progress-bar-wrap"><div class="progress-bar" style="width:33%;background:var(--success)"></div></div>
+              <div style="margin-top:10px;font-size:12px;color:var(--gray-500)">班级平均分（已批）</div>
+              <div style="font-size:20px;font-weight:700;color:var(--primary);margin-top:4px">22.4 <span style="font-size:13px;font-weight:400;color:var(--gray-400)">/36</span></div>
+            </div>
+          </div>
+        </div><!-- end hw-content -->
+      </div><!-- end hw-main -->
+    </div><!-- end hw-layout -->
+  </div>
+</div>
+
+<!-- ===== PAGE: COURSEWARE ===== -->
+<div class="page" id="page-courseware">
+  <div class="app-body" style="padding-top:var(--nav-h)">
+    <div class="cw-layout">
+      <!-- Sidebar: course tree -->
+      <div class="cw-sidebar">
+        <div class="cw-sidebar-header">
+          <h3>课件目录</h3>
+        </div>
+        <div class="cw-tree">
+          <!-- AMC8 基础 -->
+          <div class="cw-tree-group">
+            <div class="cw-tree-group-header open" onclick="toggleTree(this)">
+              <span class="cw-tree-arrow open">▶</span>
+              <span style="font-size:16px">🔵</span>
+              <span>AMC 8 基础班</span>
+            </div>
+            <div class="cw-tree-items" id="tree-amc8-basic">
+              <div class="cw-tree-item active" onclick="selectLesson('amc8-basic','1','数论基础',this)">
+                <span>📄</span><span>第1课 · 数论基础</span>
+              </div>
+              <div class="cw-tree-item" onclick="selectLesson('amc8-basic','2','几何入门',this)">
+                <span>📄</span><span>第2课 · 几何入门</span>
+              </div>
+              <div class="cw-tree-item" onclick="selectLesson('amc8-basic','3','代数方程',this)">
+                <span>📄</span><span>第3课 · 代数方程</span>
+              </div>
+              <div class="cw-tree-item" onclick="selectLesson('amc8-basic','4','代数方程组',this)">
+                <span>📄</span><span>第4课 · 代数方程组</span>
+              </div>
+              <div class="cw-tree-item" style="color:var(--gray-300)">
+                <span>📋</span><span>第5课 · 概率基础（待上传）</span>
+              </div>
+            </div>
+          </div>
+          <!-- AMC8 强化 -->
+          <div class="cw-tree-group">
+            <div class="cw-tree-group-header" onclick="toggleTree(this)">
+              <span class="cw-tree-arrow">▶</span>
+              <span style="font-size:16px">🟣</span>
+              <span>AMC 8 强化班</span>
+            </div>
+            <div class="cw-tree-items" id="tree-amc8-adv" style="display:none">
+              <div class="cw-tree-item" onclick="selectLesson('amc8-adv','1','数论进阶',this)"><span>📄</span><span>第1课 · 数论进阶</span></div>
+              <div class="cw-tree-item" onclick="selectLesson('amc8-adv','2','几何证明',this)"><span>📄</span><span>第2课 · 几何证明</span></div>
+              <div class="cw-tree-item" onclick="selectLesson('amc8-adv','3','组合计数',this)"><span>📄</span><span>第3课 · 组合计数</span></div>
+              <div class="cw-tree-item" onclick="selectLesson('amc8-adv','4','代数综合',this)"><span>📄</span><span>第4课 · 代数综合</span></div>
+            </div>
+          </div>
+          <!-- AMC10 冲刺 -->
+          <div class="cw-tree-group">
+            <div class="cw-tree-group-header" onclick="toggleTree(this)">
+              <span class="cw-tree-arrow">▶</span>
+              <span style="font-size:16px">🟡</span>
+              <span>AMC 10 冲刺班</span>
+            </div>
+            <div class="cw-tree-items" id="tree-amc10" style="display:none">
+              <div class="cw-tree-item" style="color:var(--gray-300)"><span>📋</span><span>第1课 · 待上传</span></div>
+              <div class="cw-tree-item" style="color:var(--gray-300)"><span>📋</span><span>第2课 · 待上传</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main: lesson content -->
+      <div class="cw-main">
+        <div class="cw-breadcrumb">
+          <span>课件管理</span>
+          <span class="cw-breadcrumb-sep">›</span>
+          <span>AMC 8 基础班</span>
+          <span class="cw-breadcrumb-sep">›</span>
+          <span class="cw-breadcrumb-current" id="cw-breadcrumb-current">第1课 · 数论基础</span>
+        </div>
+
+        <div class="cw-lesson-header">
+          <div class="cw-lesson-title" id="cw-lesson-title">第1课 · 数论基础</div>
+          <div class="cw-lesson-meta">
+            <span>📅 上课日期：2026年6月18日</span>
+            <span>⏱ 时长：90分钟</span>
+            <span>👥 班级：AMC 8 基础班（18人）</span>
+            <span>📊 作业完成率：89%</span>
+          </div>
+        </div>
+
+        <div class="cw-tabs">
+          <button class="cw-tab active" onclick="switchCwTab('slides',this)">📊 课件幻灯片</button>
+          <button class="cw-tab" onclick="switchCwTab('recording',this)">🎬 课堂录播</button>
+          <button class="cw-tab" onclick="switchCwTab('homework',this)">📝 课后作业</button>
+        </div>
+
+        <!-- Slides tab -->
+        <div id="cw-tab-slides">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <span style="font-size:13px;color:var(--gray-500)">共 8 页幻灯片</span>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-outline btn-sm" onclick="document.getElementById('slide-upload').click()">📤 上传课件</button>
+              <input type="file" id="slide-upload" accept=".pdf,.pptx,image/*" multiple style="display:none" onchange="handleSlideUpload(event)">
+              <button class="btn btn-primary btn-sm" onclick="showToast('课件已发布给学生','success')">📢 发布给学生</button>
+            </div>
+          </div>
+          <div class="cw-slides-grid" id="slides-grid">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <!-- Recording tab -->
+        <div id="cw-tab-recording" style="display:none">
+          <div style="background:#fff;border-radius:var(--radius);border:1px solid var(--gray-200);overflow:hidden">
+            <div style="background:#000;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative">
+              <div style="color:rgba(255,255,255,.6);text-align:center">
+                <div style="font-size:48px;margin-bottom:12px">▶</div>
+                <div style="font-size:14px">第1课 · 数论基础 录播</div>
+                <div style="font-size:12px;margin-top:6px;color:rgba(255,255,255,.4)">时长 1:32:45</div>
+              </div>
+            </div>
+            <div style="padding:16px">
+              <div style="font-size:14px;font-weight:600;color:var(--gray-800);margin-bottom:8px">第1课 · 数论基础</div>
+              <div style="font-size:12px;color:var(--gray-400);margin-bottom:12px">录制时间：2026年6月18日 19:00 · 时长 1:32:45 · 阿里云存储</div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-primary btn-sm">▶ 播放</button>
+                <button class="btn btn-outline btn-sm" onclick="showToast('录播已发布给学生','success')">📢 发布给学生</button>
+                <button class="btn btn-outline btn-sm" onclick="showToast('下载链接已复制')">🔗 复制链接</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Homework tab -->
+        <div id="cw-tab-homework" style="display:none">
+          <div style="background:#fff;border-radius:var(--radius);border:1px solid var(--gray-200);padding:20px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <div style="font-size:14px;font-weight:600;color:var(--gray-800)">第1课课后作业</div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-outline btn-sm" onclick="showPage('tasks')">📝 编辑作业</button>
+                <button class="btn btn-primary btn-sm" onclick="showPage('homework')">✏️ 批改作业</button>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+              <div style="background:var(--gray-50);border-radius:8px;padding:14px;text-align:center">
+                <div style="font-size:22px;font-weight:700;color:var(--primary)">18</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:4px">应提交</div>
+              </div>
+              <div style="background:#f0fdf4;border-radius:8px;padding:14px;text-align:center">
+                <div style="font-size:22px;font-weight:700;color:var(--success)">16</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:4px">已提交</div>
+              </div>
+              <div style="background:#fff7ed;border-radius:8px;padding:14px;text-align:center">
+                <div style="font-size:22px;font-weight:700;color:var(--warning)">16</div>
+                <div style="font-size:12px;color:var(--gray-400);margin-top:4px">已批改</div>
+              </div>
+            </div>
+            <div style="font-size:13px;color:var(--gray-600);margin-bottom:8px">题目列表</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--gray-50);border-radius:8px">
+                <span class="badge badge-blue">选择题</span>
+                <span style="font-size:13px;color:var(--gray-700);flex:1">Q1. If x+y=10 and xy=21, what is x²+y²?</span>
+                <span style="font-size:12px;color:var(--gray-400)">6分</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--gray-50);border-radius:8px">
+                <span class="badge badge-blue">选择题</span>
+                <span style="font-size:13px;color:var(--gray-700);flex:1">Q2. 解方程组 2x+3y=12, x-y=1，求x</span>
+                <span style="font-size:12px;color:var(--gray-400)">6分</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--gray-50);border-radius:8px">
+                <span class="badge badge-purple">解答题</span>
+                <span style="font-size:13px;color:var(--gray-700);flex:1">Q3. 解方程组 3x+2y=16, x-y=2，并验证</span>
+                <span style="font-size:12px;color:var(--gray-400)">12分</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--gray-50);border-radius:8px">
+                <span class="badge badge-purple">解答题</span>
+                <span style="font-size:13px;color:var(--gray-700);flex:1">Q4. 两正整数之和35，乘积306，求这两个数</span>
+                <span style="font-size:12px;color:var(--gray-400)">12分</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: STUDENTS ===== -->
+<div class="page" id="page-students">
+  <div class="app-body" style="padding-top:var(--nav-h)">
+    <div class="app-content">
+      <div class="section-header">
+        <div class="section-title" style="margin:0">学生数据</div>
+        <button class="btn btn-outline btn-sm" onclick="showToast('数据已导出为 Excel')">📥 导出报表</button>
+      </div>
+
+      <div class="sd-filters">
+        <select class="sd-filter-select" onchange="filterStudentData(this)">
+          <option>AMC 8 基础班</option>
+          <option>AMC 8 强化班</option>
+          <option>AMC 10 冲刺班</option>
+        </select>
+        <select class="sd-filter-select">
+          <option>全部课次</option>
+          <option>第1课</option>
+          <option>第2课</option>
+          <option>第3课</option>
+          <option>第4课</option>
+        </select>
+        <select class="sd-filter-select">
+          <option>全部知识点</option>
+          <option>代数</option>
+          <option>几何</option>
+          <option>数论</option>
+          <option>概率</option>
+        </select>
+        <input type="text" placeholder="搜索学生姓名..." style="padding:8px 14px;border:1px solid var(--gray-200);border-radius:8px;font-size:13px;outline:none;font-family:var(--font)">
+      </div>
+
+      <!-- Charts -->
+      <div class="sd-chart-grid">
+        <div class="sd-chart-card">
+          <div class="sd-chart-title">各知识点正确率（班级平均）</div>
+          <div class="bar-chart">
+            <div class="bar-row">
+              <span class="bar-label">代数方程</span>
+              <div class="bar-wrap"><div class="bar-fill" style="width:52%;background:#ef4444"></div></div>
+              <span class="bar-value">52%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">几何基础</span>
+              <div class="bar-wrap"><div class="bar-fill" style="width:71%;background:#f59e0b"></div></div>
+              <span class="bar-value">71%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">数论</span>
+              <div class="bar-wrap"><div class="bar-fill" style="width:83%;background:#16a34a"></div></div>
+              <span class="bar-value">83%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">概率</span>
+              <div class="bar-wrap"><div class="bar-fill" style="width:68%;background:#3b82f6"></div></div>
+              <span class="bar-value">68%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">组合计数</span>
+              <div class="bar-wrap"><div class="bar-fill" style="width:76%;background:#8b5cf6"></div></div>
+              <span class="bar-value">76%</span>
+            </div>
+          </div>
+        </div>
+        <div class="sd-chart-card">
+          <div class="sd-chart-title">作业完成率趋势（近4课）</div>
+          <div class="bar-chart">
+            <div class="bar-row">
+              <span class="bar-label">第1课</span>
+              <div class="bar-wrap"><div class="bar-fill" style="width:89%;background:#3b82f6"></div></div>
+              <span class="bar-value">89%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">第2课</span>
+              <div class="bar-wrap"><div class="bar-fill" style="width:83%;background:#3b82f6"></div></div>
+              <span class="bar-value">83%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">第3课</span>
+              <div class="bar-wrap"><div class="bar-fill" style="width:78%;background:#f59e0b"></div></div>
+              <span class="bar-value">78%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">第4课</span>
+              <div class="bar-wrap"><div class="bar-fill" style="width:61%;background:#ef4444"></div></div>
+              <span class="bar-value">61%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student table -->
+      <div class="sd-table-wrap">
+        <table class="sd-table">
+          <thead>
+            <tr>
+              <th>学生姓名</th>
+              <th>作业完成率</th>
+              <th>平均分</th>
+              <th>代数</th>
+              <th>几何</th>
+              <th>数论</th>
+              <th>最近提交</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="student-table-body">
+            <!-- Injected by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: TASKS ===== -->
+<div class="page" id="page-tasks">
+  <div class="app-body" style="padding-top:var(--nav-h)">
+    <div class="app-content">
+      <div class="section-title">任务下发</div>
+      <div class="task-grid">
+        <div class="task-form-card">
+          <div class="task-form-title">📝 新建作业任务</div>
+          <div class="task-form-group">
+            <label class="task-form-label">选择班级</label>
+            <select class="task-form-select">
+              <option>AMC 8 基础班（18人）</option>
+              <option>AMC 8 强化班（22人）</option>
+              <option>AMC 10 冲刺班（15人）</option>
+              <option>全部班级</option>
+            </select>
+          </div>
+          <div class="task-form-group">
+            <label class="task-form-label">作业标题</label>
+            <input type="text" class="task-form-input" placeholder="如：第5课课后作业 · 概率基础" value="第5课课后作业 · 概率基础">
+          </div>
+          <div class="task-form-group">
+            <label class="task-form-label">关联课次</label>
+            <select class="task-form-select">
+              <option>第5课 · 概率基础</option>
+              <option>第4课 · 代数方程组</option>
+              <option>第3课 · 代数方程</option>
+            </select>
+          </div>
+          <div class="task-form-group">
+            <label class="task-form-label">截止时间</label>
+            <input type="datetime-local" class="task-form-input" value="2026-07-10T23:59">
+          </div>
+          <div class="task-form-group">
+            <label class="task-form-label">题目列表</label>
+            <div class="task-question-list" id="task-q-list">
+              <div class="task-q-item">
+                <span class="badge badge-blue">选择题</span>
+                <span class="task-q-item-text">Q1. 从1到10中随机选一个数，是偶数的概率是？</span>
+                <span class="task-q-item-type">6分</span>
+                <button class="task-q-remove" onclick="removeTaskQ(this)">×</button>
+              </div>
+              <div class="task-q-item">
+                <span class="badge badge-blue">选择题</span>
+                <span class="task-q-item-text">Q2. 掷两枚硬币，两面都是正面的概率是？</span>
+                <span class="task-q-item-type">6分</span>
+                <button class="task-q-remove" onclick="removeTaskQ(this)">×</button>
+              </div>
+              <div class="task-q-item">
+                <span class="badge badge-purple">解答题</span>
+                <span class="task-q-item-text">Q3. 一个袋子里有3个红球和2个蓝球，不放回取2个，求至少1个红球的概率</span>
+                <span class="task-q-item-type">12分</span>
+                <button class="task-q-remove" onclick="removeTaskQ(this)">×</button>
+              </div>
+            </div>
+            <button class="task-add-q" onclick="addTaskQuestion()">+ 添加题目（从题库选择或手动输入）</button>
+          </div>
+          <div class="task-form-group">
+            <label class="task-form-label">作业说明（选填）</label>
+            <textarea class="task-form-textarea" placeholder="输入作业说明或注意事项...">请认真完成每道题，解答题需写出完整解题过程。截止时间前提交，逾期不予批改。</textarea>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-primary" onclick="showToast('作业已下发给学生','success')">📢 立即下发</button>
+            <button class="btn btn-outline" onclick="showToast('草稿已保存')">💾 保存草稿</button>
+            <button class="btn btn-outline" onclick="showToast('预览功能开发中')">👁 预览</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="task-history-card">
+            <div class="task-history-title">📋 历史任务</div>
+            <div class="task-history-item">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div class="task-history-name">第4课课后作业 · 代数方程组</div>
+                <span class="badge badge-yellow">批改中</span>
+              </div>
+              <div class="task-history-meta">AMC8基础班 · 下发于 6月28日 · 截止 7月2日</div>
+              <div class="task-history-meta" style="margin-top:4px">提交 18/18 · 已批 5/18</div>
+              <button class="btn btn-outline btn-xs" style="margin-top:8px" onclick="showPage('homework')">去批改</button>
+            </div>
+            <div class="task-history-item">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div class="task-history-name">第3课课后作业 · 代数方程</div>
+                <span class="badge badge-green">已完成</span>
+              </div>
+              <div class="task-history-meta">AMC8基础班 · 下发于 6月21日 · 截止 6月25日</div>
+              <div class="task-history-meta" style="margin-top:4px">提交 16/18 · 已批 16/16 · 均分 28.4/36</div>
+            </div>
+            <div class="task-history-item">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div class="task-history-name">第2课课后作业 · 几何入门</div>
+                <span class="badge badge-green">已完成</span>
+              </div>
+              <div class="task-history-meta">AMC8基础班 · 下发于 6月14日 · 截止 6月18日</div>
+              <div class="task-history-meta" style="margin-top:4px">提交 17/18 · 已批 17/17 · 均分 31.2/36</div>
+            </div>
+            <div class="task-history-item">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div class="task-history-name">第1课课后作业 · 数论基础</div>
+                <span class="badge badge-green">已完成</span>
+              </div>
+              <div class="task-history-meta">AMC8基础班 · 下发于 6月7日 · 截止 6月11日</div>
+              <div class="task-history-meta" style="margin-top:4px">提交 18/18 · 已批 18/18 · 均分 29.8/36</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: AI SUGGESTIONS ===== -->
+<div class="page" id="page-ai">
+  <div class="app-body" style="padding-top:var(--nav-h)">
+    <div class="app-content">
+      <div class="section-header">
+        <div class="section-title" style="margin:0">🤖 AI 教学建议</div>
+        <div style="display:flex;gap:8px">
+          <select class="sd-filter-select">
+            <option>AMC 8 基础班</option>
+            <option>AMC 8 强化班</option>
+            <option>全部班级</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="showToast('AI 正在重新分析数据...')">🔄 重新分析</button>
+        </div>
+      </div>
+
+      <div class="ai-page-grid">
+        <!-- Teaching suggestions -->
+        <div class="ai-big-card">
+          <div class="ai-big-title">📌 本周教学建议</div>
+          <div class="ai-suggestion-item warn">
+            <div class="ai-suggestion-item-title">⚠ 代数方程组正确率偏低（52%）</div>
+            <div class="ai-suggestion-item-body">
+              AMC8基础班第3、4课代数模块平均正确率仅52%，低于目标值70%。主要错误集中在消元法运算步骤和方程组验证环节。<br><br>
+              <strong>建议行动：</strong><br>
+              1. 本周下发2道代数专项练习题（消元法为主）<br>
+              2. 下节课前10分钟回顾方程组解题步骤<br>
+              3. 对错误率＞80%的学生（共4人）单独发送补充材料
+            </div>
+            <div class="ai-suggestion-item-action">
+              <button class="btn btn-primary btn-sm" onclick="showPage('tasks')">📝 立即下发练习题</button>
+              <button class="btn btn-outline btn-sm" style="margin-left:8px" onclick="showToast('已标记为待处理')">稍后处理</button>
+            </div>
+          </div>
+          <div class="ai-suggestion-item good">
+            <div class="ai-suggestion-item-title">✅ 数论模块表现优秀（83%）</div>
+            <div class="ai-suggestion-item-body">
+              AMC8基础班数论模块平均正确率83%，超过目标值。学生对整除性、因数分解掌握较好。<br><br>
+              <strong>建议行动：</strong><br>
+              1. 可适当提升数论题目难度，引入 AMC8 历年真题<br>
+              2. 对表现优秀的学生（正确率＞90%，共7人）推荐进阶材料
+            </div>
+            <div class="ai-suggestion-item-action">
+              <button class="btn btn-outline btn-sm" onclick="showToast('进阶材料已推荐给7名学生','success')">推荐进阶材料</button>
+            </div>
+          </div>
+          <div class="ai-suggestion-item">
+            <div class="ai-suggestion-item-title">📊 作业完成率下降趋势（89%→61%）</div>
+            <div class="ai-suggestion-item-body">
+              近4课作业完成率呈下降趋势（89%→83%→78%→61%）。第4课完成率仅61%，主要原因可能是题目难度增加或截止时间设置不合理。<br><br>
+              <strong>建议行动：</strong><br>
+              1. 检查未提交学生名单，通过班主任端发送提醒<br>
+              2. 下次作业适当降低难度或延长截止时间<br>
+              3. 考虑在课堂上预留10分钟完成部分作业
+            </div>
+            <div class="ai-suggestion-item-action">
+              <button class="btn btn-outline btn-sm" onclick="showToast('提醒已发送给班主任','success')">通知班主任提醒</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Knowledge map -->
+        <div class="ai-big-card">
+          <div class="ai-big-title">🗺 知识点掌握地图</div>
+          <div style="font-size:12px;color:var(--gray-400);margin-bottom:14px">AMC8基础班 · 班级平均</div>
+          <div class="ai-knowledge-map">
+            <div class="ai-km-item" style="background:#fff1f2">
+              <div class="ai-km-item-label">代数方程</div>
+              <div class="ai-km-item-score" style="color:#dc2626">52%</div>
+              <div class="ai-km-item-bar"><div class="ai-km-item-fill" style="width:52%;background:#dc2626"></div></div>
+            </div>
+            <div class="ai-km-item" style="background:#fff7ed">
+              <div class="ai-km-item-label">几何基础</div>
+              <div class="ai-km-item-score" style="color:#d97706">71%</div>
+              <div class="ai-km-item-bar"><div class="ai-km-item-fill" style="width:71%;background:#d97706"></div></div>
+            </div>
+            <div class="ai-km-item" style="background:#f0fdf4">
+              <div class="ai-km-item-label">数论</div>
+              <div class="ai-km-item-score" style="color:#16a34a">83%</div>
+              <div class="ai-km-item-bar"><div class="ai-km-item-fill" style="width:83%;background:#16a34a"></div></div>
+            </div>
+            <div class="ai-km-item" style="background:#eff6ff">
+              <div class="ai-km-item-label">概率</div>
+              <div class="ai-km-item-score" style="color:#1d4ed8">68%</div>
+              <div class="ai-km-item-bar"><div class="ai-km-item-fill" style="width:68%;background:#1d4ed8"></div></div>
+            </div>
+            <div class="ai-km-item" style="background:#faf5ff">
+              <div class="ai-km-item-label">组合计数</div>
+              <div class="ai-km-item-score" style="color:#7c3aed">76%</div>
+              <div class="ai-km-item-bar"><div class="ai-km-item-fill" style="width:76%;background:#7c3aed"></div></div>
+            </div>
+            <div class="ai-km-item" style="background:#f0fdf4">
+              <div class="ai-km-item-label">逻辑推理</div>
+              <div class="ai-km-item-score" style="color:#16a34a">79%</div>
+              <div class="ai-km-item-bar"><div class="ai-km-item-fill" style="width:79%;background:#16a34a"></div></div>
+            </div>
+          </div>
+          <div style="margin-top:20px">
+            <div class="ai-big-title" style="font-size:13px">🎯 重点关注学生</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--gray-50);border-radius:8px">
+                <div style="width:28px;height:28px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#dc2626">张</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500;color:var(--gray-800)">张晓宇</div>
+                  <div style="font-size:11px;color:var(--gray-400)">代数正确率 31% · 近2次作业未提交</div>
+                </div>
+                <button class="btn btn-xs btn-danger" onclick="showToast('已通知班主任联系张晓宇家长','success')">⚠ 预警</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--gray-50);border-radius:8px">
+                <div style="width:28px;height:28px;border-radius:50%;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#d97706">王</div>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:500;color:var(--gray-800)">王思远</div>
+                  <div style="font-size:11px;color:var(--gray-400)">整体完成率 56% · 几何模块薄弱</div>
+                </div>
+                <button class="btn btn-xs" style="background:var(--warning-light);color:var(--warning);border:none" onclick="showToast('补充材料已发送给王思远','success')">补充材料</button>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding:12px;background:var(--primary-light);border-radius:8px;font-size:11px;color:var(--primary-dark);line-height:1.7">
+            🤖 以上分析基于近4次作业数据，由 AI 自动生成。建议结合课堂观察综合判断，不作为唯一评价依据。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== MOCK DATA =====
+const STUDENTS = [
+  {id:1,name:'李明远',avatar:'李',status:'graded',score:28,submitted:true,color:'#dbeafe'},
+  {id:2,name:'张晓宇',avatar:'张',status:'graded',score:22,submitted:true,color:'#fee2e2'},
+  {id:3,name:'王思远',avatar:'王',status:'graded',score:31,submitted:true,color:'#fef3c7'},
+  {id:4,name:'陈雨欣',avatar:'陈',status:'graded',score:33,submitted:true,color:'#dcfce7'},
+  {id:5,name:'刘子豪',avatar:'刘',status:'graded',score:26,submitted:true,color:'#ede9fe'},
+  {id:6,name:'赵梦琪',avatar:'赵',status:'pending',score:null,submitted:true,color:'#dbeafe'},
+  {id:7,name:'孙浩然',avatar:'孙',status:'pending',score:null,submitted:true,color:'#fef3c7'},
+  {id:8,name:'周佳怡',avatar:'周',status:'pending',score:null,submitted:true,color:'#dcfce7'},
+  {id:9,name:'吴宇轩',avatar:'吴',status:'pending',score:null,submitted:true,color:'#ede9fe'},
+  {id:10,name:'郑思琦',avatar:'郑',status:'pending',score:null,submitted:true,color:'#fee2e2'},
+  {id:11,name:'冯晨曦',avatar:'冯',status:'pending',score:null,submitted:true,color:'#dbeafe'},
+  {id:12,name:'蒋雪儿',avatar:'蒋',status:'pending',score:null,submitted:true,color:'#fef3c7'},
+  {id:13,name:'韩志远',avatar:'韩',status:'pending',score:null,submitted:true,color:'#dcfce7'},
+  {id:14,name:'杨梦瑶',avatar:'杨',status:'pending',score:null,submitted:true,color:'#ede9fe'},
+  {id:15,name:'谢天宇',avatar:'谢',status:'pending',score:null,submitted:true,color:'#fee2e2'},
+  {id:16,name:'林晓彤',avatar:'林',status:'not-submitted',score:null,submitted:false,color:'#f1f5f9'},
+  {id:17,name:'徐嘉琪',avatar:'徐',status:'not-submitted',score:null,submitted:false,color:'#f1f5f9'},
+  {id:18,name:'曹宇航',avatar:'曹',status:'not-submitted',score:null,submitted:false,color:'#f1f5f9'},
+];
+
+const STUDENT_TABLE_DATA = [
+  {name:'李明远',completion:100,avg:28,algebra:52,geometry:78,number:89,lastSubmit:'今天',status:'active'},
+  {name:'张晓宇',completion:56,avg:18,algebra:31,geometry:45,number:62,lastSubmit:'3天前',status:'warning'},
+  {name:'王思远',completion:67,avg:24,algebra:58,geometry:52,number:71,lastSubmit:'昨天',status:'normal'},
+  {name:'陈雨欣',completion:100,avg:33,algebra:88,geometry:91,number:95,lastSubmit:'今天',status:'excellent'},
+  {name:'刘子豪',completion:89,avg:26,algebra:61,geometry:72,number:83,lastSubmit:'今天',status:'normal'},
+  {name:'赵梦琪',completion:78,avg:29,algebra:71,geometry:68,number:88,lastSubmit:'昨天',status:'normal'},
+  {name:'孙浩然',completion:100,avg:31,algebra:79,geometry:85,number:92,lastSubmit:'今天',status:'excellent'},
+  {name:'周佳怡',completion:89,avg:27,algebra:63,geometry:74,number:81,lastSubmit:'今天',status:'normal'},
+];
+
+let currentStudentIdx = 0;
+let currentFilter = 'all';
+let scores = {3: 9, 4: null};
+
+// ===== PAGE ROUTER =====
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + name);
+  if (target) target.classList.add('active');
+
+  document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+  const navMap = {dashboard:'首页',homework:'作业批改',courseware:'课件管理',students:'学生数据',tasks:'任务下发',ai:'AI 建议'};
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    if (btn.textContent.trim() === navMap[name]) btn.classList.add('active');
+  });
+
+  if (name === 'homework') initHomeworkPage();
+  if (name === 'courseware') initCoursewarePage();
+  if (name === 'students') initStudentTable();
+}
+
+// ===== LOGIN =====
+function doLogin() {
+  const id = document.getElementById('login-id').value.trim();
+  const pwd = document.getElementById('login-pwd').value.trim();
+  if (!id || !pwd) { showToast('请输入工号和密码', 'error'); return; }
+  showToast('登录成功，欢迎回来 👋', 'success');
+  setTimeout(() => {
+    document.getElementById('page-login').classList.remove('active');
+    document.getElementById('app-nav').style.display = 'flex';
+    showPage('dashboard');
+  }, 800);
+}
+
+document.getElementById('tab-account').addEventListener('click', function() {
+  this.classList.add('active');
+  document.getElementById('tab-phone').classList.remove('active');
+  document.getElementById('login-account-form').style.display = 'block';
+  document.getElementById('login-phone-form').style.display = 'none';
+});
+document.getElementById('tab-phone').addEventListener('click', function() {
+  this.classList.add('active');
+  document.getElementById('tab-account').classList.remove('active');
+  document.getElementById('login-phone-form').style.display = 'block';
+  document.getElementById('login-account-form').style.display = 'none';
+});
+
+// Allow Enter key to login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('page-login').classList.contains('active')) doLogin();
+});
+
+// ===== TOAST =====
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' '+type : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ===== HOMEWORK PAGE =====
+function initHomeworkPage() {
+  renderStudentList(currentFilter);
+  selectStudent(currentStudentIdx);
+  initCanvas();
+  initCanvas2();
+  drawStudentWork();
+  drawStudentWork2();
+}
+
+function renderStudentList(filter) {
+  const list = document.getElementById('student-list');
+  list.innerHTML = '';
+  STUDENTS.forEach((s, i) => {
+    if (filter === 'pending' && s.status !== 'pending') return;
+    if (filter === 'done' && s.status !== 'graded') return;
+    const item = document.createElement('div');
+    item.className = 'hw-student-item' + (i === currentStudentIdx ? ' active' : '');
+    item.onclick = () => selectStudent(i);
+    const statusBadge = s.status === 'graded'
+      ? '<span class="badge badge-green" style="font-size:10px">已批</span>'
+      : s.status === 'pending'
+      ? '<span class="badge badge-yellow" style="font-size:10px">待批</span>'
+      : '<span class="badge badge-gray" style="font-size:10px">未交</span>';
+    item.innerHTML = `
+      <div class="hw-student-avatar" style="background:${s.color}">${s.avatar}</div>
+      <div class="hw-student-info">
+        <div class="hw-student-name">${s.name}</div>
+        <div class="hw-student-status">${s.submitted ? (s.score !== null ? '得分 '+s.score+'/36' : '已提交') : '未提交'}</div>
+      </div>
+      <div class="hw-student-badge">${statusBadge}</div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function selectStudent(idx) {
+  currentStudentIdx = idx;
+  const s = STUDENTS[idx];
+  document.getElementById('hw-student-name-display').textContent = '当前：' + s.name;
+  document.querySelectorAll('.hw-student-item').forEach((el, i) => {
+    el.classList.toggle('active', i === idx);
+  });
+}
+
+function filterStudents(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.hw-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderStudentList(type);
+}
+
+function prevStudent() {
+  if (currentStudentIdx > 0) { currentStudentIdx--; selectStudent(currentStudentIdx); }
+  else showToast('已是第一位学生');
+}
+function nextStudent() {
+  if (currentStudentIdx < STUDENTS.length - 1) { currentStudentIdx++; selectStudent(currentStudentIdx); }
+  else showToast('已是最后一位学生');
+}
+
+function submitGrade() {
+  if (scores[4] === null) { showToast('请完成第4题批改后再提交', 'error'); return; }
+  STUDENTS[currentStudentIdx].status = 'graded';
+  STUDENTS[currentStudentIdx].score = 6 + 0 + (scores[3]||0) + (scores[4]||0);
+  renderStudentList(currentFilter);
+  showToast('批改已提交，自动跳转下一位学生', 'success');
+  setTimeout(() => { if (currentStudentIdx < STUDENTS.length-1) { currentStudentIdx++; selectStudent(currentStudentIdx); }}, 1000);
+}
+
+function updateScore(qnum, val, max) {
+  const v = Math.min(max, Math.max(0, parseInt(val)||0));
+  scores[qnum] = v;
+  const fixed6 = 6 + 0;
+  const total = fixed6 + (scores[3]||0) + (scores[4]||0);
+  document.getElementById('total-score').textContent = total;
+  if (qnum === 3) {
+    document.getElementById('q3-score-display').textContent = v + '/12';
+    document.getElementById('q3-score-summary').textContent = v + '/12';
+    document.getElementById('q3-dot').style.background = 'var(--success)';
+    document.getElementById('q3-status').textContent = '已批改';
+    document.getElementById('q3-status').className = 'badge badge-green';
+  }
+  if (qnum === 4) {
+    document.getElementById('q4-score-display').textContent = v + '/12';
+    document.getElementById('q4-score-summary').textContent = v + '/12';
+    document.getElementById('q4-dot').style.background = 'var(--success)';
+    document.getElementById('q4-status').textContent = '已批改';
+    document.getElementById('q4-status').className = 'badge badge-green';
+  }
+}
+
+function acceptAiScore() {
+  document.getElementById('q3-score-input').value = 9;
+  updateScore(3, 9, 12);
+  showToast('已采纳 AI 建议：9分', 'success');
+}
+
+function generateAiComment() {
+  const textarea = document.getElementById('teacher-comment');
+  textarea.value = '正在生成...';
+  setTimeout(() => {
+    textarea.value = '本次作业整体完成质量良好。选择题第1题掌握扎实，第2题方程组消元出现运算失误，需重点练习。解答题第3题解题思路正确，但缺少验证步骤，请注意规范。建议课后复习消元法运算步骤，并养成验算习惯。继续加油！';
+    showToast('AI 评语已生成', 'success');
+  }, 1200);
+}
+
+function toggleTag(el) {
+  el.classList.toggle('active');
+}
+
+function addCustomTag() {
+  const name = prompt('输入自定义标签名称：');
+  if (!name) return;
+  const tag = document.createElement('span');
+  tag.className = 'tag active';
+  tag.textContent = name;
+  tag.onclick = () => toggleTag(tag);
+  document.getElementById('q3-tags').insertBefore(tag, document.querySelector('.tag-add'));
+}
+
+// ===== CANVAS 1 (Q3) =====
+let canvas1, ctx1, isDrawing1=false, tool1='pen', color1='#ef4444', brushSize1=3;
+let history1=[], startX1, startY1;
+
+function initCanvas() {
+  canvas1 = document.getElementById('annotation-canvas');
+  if (!canvas1) return;
+  ctx1 = canvas1.getContext('2d');
+  resizeCanvas(canvas1, ctx1);
+
+  canvas1.addEventListener('pointerdown', e => { e.preventDefault(); isDrawing1=true; const p=getPos(canvas1,e); startX1=p.x; startY1=p.y; ctx1.beginPath(); ctx1.moveTo(p.x,p.y); saveHistory1(); });
+  canvas1.addEventListener('pointermove', e => { if(!isDrawing1) return; e.preventDefault(); const p=getPos(canvas1,e); draw1(p.x,p.y,e.pressure||1); });
+  canvas1.addEventListener('pointerup', e => { isDrawing1=false; ctx1.closePath(); });
+  canvas1.addEventListener('pointerleave', e => { isDrawing1=false; });
+  canvas1.setPointerCapture && canvas1.addEventListener('pointerdown', e => canvas1.setPointerCapture(e.pointerId));
+}
+
+function draw1(x, y, pressure) {
+  if (tool1 === 'eraser') {
+    ctx1.globalCompositeOperation = 'destination-out';
+    ctx1.lineWidth = brushSize1 * 4;
+  } else {
+    ctx1.globalCompositeOperation = 'source-over';
+    ctx1.strokeStyle = color1;
+    ctx1.lineWidth = brushSize1 * (pressure || 1);
+    ctx1.lineCap = 'round';
+    ctx1.lineJoin = 'round';
+  }
+  ctx1.lineTo(x, y);
+  ctx1.stroke();
+  ctx1.beginPath();
+  ctx1.moveTo(x, y);
+}
+
+function saveHistory1() {
+  history1.push(ctx1.getImageData(0,0,canvas1.width,canvas1.height));
+  if (history1.length > 30) history1.shift();
+}
+
+function undoCanvas() {
+  if (history1.length > 1) { history1.pop(); ctx1.putImageData(history1[history1.length-1],0,0); }
+  else { ctx1.clearRect(0,0,canvas1.width,canvas1.height); }
+}
+
+function clearCanvas() {
+  if (!confirm('确定清除所有批注？')) return;
+  ctx1.clearRect(0,0,canvas1.width,canvas1.height);
+  history1=[];
+}
+
+function saveAnnotation() {
+  const link = document.createElement('a');
+  link.download = '批注_' + STUDENTS[currentStudentIdx].name + '_Q3.png';
+  link.href = canvas1.toDataURL();
+  link.click();
+  showToast('批注已保存为图片', 'success');
+}
+
+function setTool(t) {
+  tool1 = t;
+  document.querySelectorAll('[id^=tool-]').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('tool-'+t);
+  if (btn) btn.classList.add('active');
+}
+
+function setColor(c, el) {
+  color1 = c;
+  tool1 = 'pen';
+  document.querySelectorAll('.canvas-color-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  setTool('pen');
+}
+
+function updateBrushSize(v) {
+  brushSize1 = parseInt(v);
+  document.getElementById('brush-size-label').textContent = v;
+}
+
+// ===== CANVAS 2 (Q4) =====
+let canvas2, ctx2, isDrawing2=false, tool2='pen', color2='#ef4444', brushSize2=3;
+
+function initCanvas2() {
+  canvas2 = document.getElementById('annotation-canvas-2');
+  if (!canvas2) return;
+  ctx2 = canvas2.getContext('2d');
+  resizeCanvas(canvas2, ctx2);
+
+  canvas2.addEventListener('pointerdown', e => { e.preventDefault(); isDrawing2=true; const p=getPos(canvas2,e); ctx2.beginPath(); ctx2.moveTo(p.x,p.y); });
+  canvas2.addEventListener('pointermove', e => { if(!isDrawing2) return; e.preventDefault(); const p=getPos(canvas2,e); draw2(p.x,p.y,e.pressure||1); });
+  canvas2.addEventListener('pointerup', () => { isDrawing2=false; });
+  canvas2.addEventListener('pointerleave', () => { isDrawing2=false; });
+}
+
+function draw2(x, y, pressure) {
+  if (tool2==='eraser') { ctx2.globalCompositeOperation='destination-out'; ctx2.lineWidth=brushSize2*4; }
+  else { ctx2.globalCompositeOperation='source-over'; ctx2.strokeStyle=color2; ctx2.lineWidth=brushSize2*(pressure||1); ctx2.lineCap='round'; ctx2.lineJoin='round'; }
+  ctx2.lineTo(x,y); ctx2.stroke(); ctx2.beginPath(); ctx2.moveTo(x,y);
+}
+
+function setTool2(t) { tool2=t; }
+function setColor2(c, el) { color2=c; tool2='pen'; document.querySelectorAll('#annotation-canvas-2').forEach(()=>{}); }
+function clearCanvas2() { ctx2.clearRect(0,0,canvas2.width,canvas2.height); }
+function saveAnnotation2() { const l=document.createElement('a'); l.download='批注_Q4.png'; l.href=canvas2.toDataURL(); l.click(); showToast('批注已保存','success'); }
+
+// ===== CANVAS HELPERS =====
+function getPos(canvas, e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+}
+
+function resizeCanvas(canvas, ctx) {
+  const rect = canvas.getBoundingClientRect();
+  if (rect.width > 0) {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = canvas.height; // keep height
+  }
+}
+
+// ===== DRAW MOCK STUDENT WORK =====
+function drawStudentWork() {
+  const c = document.getElementById('student-work-canvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#fffef7';
+  ctx.fillRect(0,0,c.width,c.height);
+  ctx.font = '16px "PingFang SC","Microsoft YaHei",serif';
+  ctx.fillStyle = '#1e293b';
+
+  const lines = [
+    '解：由第二个方程 x - y = 2，得 x = y + 2',
+    '代入第一个方程：3(y + 2) + 2y = 16',
+    '展开：3y + 6 + 2y = 16',
+    '合并：5y = 10',
+    '∴ y = 2',
+    '将 y = 2 代入 x = y + 2，得 x = 4',
+    '∴ 解为 x = 4, y = 2',
+  ];
+  lines.forEach((line, i) => {
+    ctx.fillText(line, 24, 36 + i * 34);
+  });
+  // Simulate pen strokes (slightly imperfect)
+  ctx.font = 'italic 13px serif';
+  ctx.fillStyle = '#64748b';
+  ctx.fillText('（未写验证步骤）', 24, 260);
+}
+
+function drawStudentWork2() {
+  const c = document.getElementById('student-work-canvas-2');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#fffef7';
+  ctx.fillRect(0,0,c.width,c.height);
+  ctx.font = '16px "PingFang SC","Microsoft YaHei",serif';
+  ctx.fillStyle = '#1e293b';
+  const lines = [
+    '设两正整数为 a, b，则 a + b = 35，ab = 306',
+    '由韦达定理，a, b 是方程 t² - 35t + 306 = 0 的两根',
+    '判别式 Δ = 35² - 4×306 = 1225 - 1224 = 1',
+    't = (35 ± 1) / 2',
+    '∴ t₁ = 18, t₂ = 17',
+    '验证：18 + 17 = 35 ✓，18 × 17 = 306 ✓',
+  ];
+  lines.forEach((line, i) => ctx.fillText(line, 24, 36 + i * 32));
+}
+
+// Handle photo upload
+function handleUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.getElementById('student-work-canvas');
+      const ctx = c.getContext('2d');
+      c.height = Math.round(c.width * img.height / img.width);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  showToast('图片上传成功', 'success');
+}
+
+// ===== COURSEWARE PAGE =====
+function initCoursewarePage() {
+  renderSlides();
+}
+
+function renderSlides() {
+  const grid = document.getElementById('slides-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const slideNames = ['封面 · 数论基础','整除性与因数','质数与合数','最大公因数','最小公倍数','数论例题 I','数论例题 II','综合练习'];
+  slideNames.forEach((name, i) => {
+    const card = document.createElement('div');
+    card.className = 'cw-slide-card' + (i===0?' active':'');
+    card.onclick = () => { document.querySelectorAll('.cw-slide-card').forEach(c=>c.classList.remove('active')); card.classList.add('active'); };
+    card.innerHTML = `
+      <div class="cw-slide-thumb-placeholder" style="background:${['#eff6ff','#f0fdf4','#faf5ff','#fff7ed','#f0f9ff','#fdf4ff','#f0fdf4','#eff6ff'][i%8]}">
+        <div style="text-align:center">
+          <div style="font-size:20px;margin-bottom:4px">${['📊','🔢','🔵','🔗','⛓','📝','📝','✏️'][i]}</div>
+          <div style="font-size:10px;color:var(--gray-400)">第 ${i+1} 页</div>
+        </div>
+      </div>
+      <div class="cw-slide-label">${name}</div>
+    `;
+    grid.appendChild(card);
+  });
+  // Add upload slot
+  const addCard = document.createElement('div');
+  addCard.style.cssText = 'border:2px dashed var(--gray-300);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;aspect-ratio:16/9;cursor:pointer;color:var(--gray-400);font-size:12px;gap:4px;background:#fff;transition:border-color .15s;padding:16px;';
+  addCard.innerHTML = '<span style="font-size:24px">+</span><span>上传新幻灯片</span>';
+  addCard.onmouseenter = () => addCard.style.borderColor = 'var(--primary)';
+  addCard.onmouseleave = () => addCard.style.borderColor = 'var(--gray-300)';
+  addCard.onclick = () => document.getElementById('slide-upload').click();
+  grid.appendChild(addCard);
+}
+
+function toggleTree(header) {
+  const arrow = header.querySelector('.cw-tree-arrow');
+  const items = header.nextElementSibling;
+  const isOpen = arrow.classList.contains('open');
+  arrow.classList.toggle('open', !isOpen);
+  header.classList.toggle('open', !isOpen);
+  items.style.display = isOpen ? 'none' : 'block';
+}
+
+function selectLesson(classId, lessonNum, lessonName, el) {
+  document.querySelectorAll('.cw-tree-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('cw-breadcrumb-current').textContent = '第'+lessonNum+'课 · '+lessonName;
+  document.getElementById('cw-lesson-title').textContent = '第'+lessonNum+'课 · '+lessonName;
+  renderSlides();
+}
+
+function switchCwTab(tab, btn) {
+  ['slides','recording','homework'].forEach(t => {
+    document.getElementById('cw-tab-'+t).style.display = t===tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.cw-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function handleSlideUpload(e) {
+  if (e.target.files.length > 0) {
+    showToast('课件上传成功，共 '+e.target.files.length+' 个文件', 'success');
+    renderSlides();
+  }
+}
+
+// ===== STUDENT TABLE =====
+function initStudentTable() {
+  const tbody = document.getElementById('student-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  STUDENT_TABLE_DATA.forEach(s => {
+    const statusBadge = s.status === 'excellent'
+      ? '<span class="badge badge-green">优秀</span>'
+      : s.status === 'warning'
+      ? '<span class="badge badge-red">预警</span>'
+      : '<span class="badge badge-gray">正常</span>';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--primary)">${s.name[0]}</div>
+        <span>${s.name}</span>
+      </div></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="progress-mini"><div class="progress-mini-fill" style="width:${s.completion}%;background:${s.completion>=80?'var(--success)':s.completion>=60?'var(--warning)':'var(--danger)'}"></div></div>
+          <span>${s.completion}%</span>
+        </div>
+      </td>
+      <td><strong style="color:var(--primary)">${s.avg}</strong>/36</td>
+      <td><span style="color:${s.algebra>=70?'var(--success)':s.algebra>=50?'var(--warning)':'var(--danger)'}">${s.algebra}%</span></td>
+      <td><span style="color:${s.geometry>=70?'var(--success)':s.geometry>=50?'var(--warning)':'var(--danger)'}">${s.geometry}%</span></td>
+      <td><span style="color:${s.number>=70?'var(--success)':s.number>=50?'var(--warning)':'var(--danger)'}">${s.number}%</span></td>
+      <td style="color:var(--gray-400)">${s.lastSubmit}</td>
+      <td>${statusBadge}</td>
+      <td>
+        <button class="btn btn-xs btn-outline" onclick="showToast('查看 ${s.name} 详细数据')">详情</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterStudentData(sel) {
+  showToast('已切换至 ' + sel.value);
+}
+
+// ===== TASK PAGE =====
+function removeTaskQ(btn) {
+  btn.closest('.task-q-item').remove();
+  showToast('题目已移除');
+}
+
+function addTaskQuestion() {
+  const list = document.getElementById('task-q-list');
+  const item = document.createElement('div');
+  item.className = 'task-q-item';
+  item.innerHTML = `
+    <span class="badge badge-blue">选择题</span>
+    <span class="task-q-item-text">新题目（点击编辑）</span>
+    <span class="task-q-item-type">6分</span>
+    <button class="task-q-remove" onclick="removeTaskQ(this)">×</button>
+  `;
+  list.appendChild(item);
+  showToast('题目已添加，请编辑题目内容');
+}
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', () => {
+  // Pre-draw student work after a short delay
+  setTimeout(() => {
+    drawStudentWork();
+    drawStudentWork2();
+  }, 100);
+});
+</script>
