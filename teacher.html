@@ -2179,6 +2179,7 @@ function showToast(msg, type='') {
 }
 
 // ===== HOMEWORK PAGE =====
+let sliceCanvasDrawn = false;
 function initHomeworkPage() {
   renderStudentList(currentFilter);
   selectStudent(currentStudentIdx);
@@ -2186,6 +2187,20 @@ function initHomeworkPage() {
   initCanvas2();
   drawStudentWork();
   drawStudentWork2();
+  // 切片Canvas必须在页面可见后才绘制，用requestAnimationFrame确保布局完成
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      drawSliceCanvas('q1-slice-canvas', {
+        question: 'If x+y=10 and xy=21, find x²+y²?  (A)58  (B)62  (C)79  (D)100',
+        answer: ['学生圈选答案：A  (58)', '', 'AI识别置信度: 97%']
+      }, true);
+      drawSliceCanvas('q2-slice-canvas', {
+        question: '2x+3y=12, x-y=1. Find x.  (A)2  (B)3  (C)4  (D)5',
+        answer: ['学生圈选答案：C  (4)  ← 错误', 'AI识别置信度: 94%', '正确答案应为: B (3)']
+      }, true);
+      sliceCanvasDrawn = true;
+    });
+  });
 }
 
 function renderStudentList(filter) {
@@ -2707,7 +2722,13 @@ function drawSliceCanvas(canvasId, lines, hasQuestion) {
   const c = document.getElementById(canvasId);
   if (!c) return;
   const ctx = c.getContext('2d');
-  const W = c.width, H = c.height;
+  // 使用实际渲染宽度，避免页面隐藏时clientWidth=0的问题
+  const displayW = c.clientWidth || c.offsetWidth || 700;
+  const H_FIXED = 200; // 固定高度
+  // 强制设置 canvas 的像素尺寸
+  c.width = displayW;
+  c.height = H_FIXED;
+  const W = displayW, H = H_FIXED;
 
   // Paper background
   ctx.fillStyle = '#fffef7';
@@ -2838,18 +2859,7 @@ function handleUpload2(e) {
 
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    drawStudentWork();
-    drawStudentWork2();
-    // Draw slice canvases
-    drawSliceCanvas('q1-slice-canvas', {
-      question: 'If x+y=10 and xy=21, find x²+y²?  (A)58  (B)62  (C)79  (D)100',
-      answer: ['学生圈选答案：A  (58)', '', 'AI识别置信度: 97%']
-    }, true);
-    drawSliceCanvas('q2-slice-canvas', {
-      question: '2x+3y=12, x-y=1. Find x.  (A)2  (B)3  (C)4  (D)5',
-      answer: ['学生圈选答案：C  (4)  ← 错误', 'AI识别置信度: 94%', '正确答案应为: B (3)']
-    }, true);
-  }, 150);
+  // 切片Canvas在showPage('homework')时才绘制，此处不需要调用
+  // drawStudentWork 也在 initHomeworkPage 里调用，此处无需重复
 });
 </script>
