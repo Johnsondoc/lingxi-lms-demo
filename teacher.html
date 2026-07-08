@@ -1285,19 +1285,43 @@ input, select, textarea { font-family: var(--font); }
                 </div>
 
                 <!-- 切片图区（完整展示，不裁剪，含题目+答题区） -->
-                <div class="slice-photo-container">
-                  <div class="slice-photo-toolbar">
-                    <span class="slice-photo-label">📷 AI 切片（含题目区 + 答题区，完整展示）</span>
-                    <span style="font-size:11px;color:var(--gray-400)">Q3 · 第3题</span>
-                    <button class="btn btn-xs btn-outline" style="margin-left:auto" onclick="openPhotoModal('q3-original','第3题 · 原始照片')">🔍 查看原照片</button>
-                    <button class="btn btn-xs btn-outline" onclick="document.getElementById('upload-input').click()">📤 重新上传</button>
+                <!-- 切片区 + 手写批注叠加展示 -->
+                <div class="slice-photo-container" style="margin-bottom:14px">
+                  <!-- 工具栏：切片信息 + 批注工具 -->
+                  <div class="canvas-toolbar" style="border-radius:8px 8px 0 0;flex-wrap:wrap;gap:6px">
+                    <span style="font-size:12px;font-weight:500;color:rgba(255,255,255,.9)">📷 AI 切片（题目区 + 答题区）</span>
+                    <span style="font-size:11px;color:rgba(255,255,255,.5)">Q3 · 第3题</span>
+                    <div style="flex:1"></div>
+                    <button class="canvas-tool-btn active" id="tool-pen" onclick="setTool('pen')" title="画笔">✏️</button>
+                    <button class="canvas-tool-btn" id="tool-eraser" onclick="setTool('eraser')" title="橡皮擦">⬜</button>
+                    <button class="canvas-tool-btn" id="tool-line" onclick="setTool('line')" title="直线">╯</button>
+                    <div class="canvas-divider"></div>
+                    <div class="canvas-color-btn active" style="background:#ef4444" onclick="setColor('#ef4444',this)" title="红色"></div>
+                    <div class="canvas-color-btn" style="background:#3b82f6" onclick="setColor('#3b82f6',this)" title="蓝色"></div>
+                    <div class="canvas-color-btn" style="background:#16a34a" onclick="setColor('#16a34a',this)" title="绿色"></div>
+                    <div class="canvas-color-btn" style="background:#f59e0b" onclick="setColor('#f59e0b',this)" title="橙色"></div>
+                    <div class="canvas-color-btn" style="background:#1e293b" onclick="setColor('#1e293b',this)" title="黑色"></div>
+                    <div class="canvas-divider"></div>
+                    <span class="canvas-size-label">粗细</span>
+                    <input type="range" class="canvas-size-input" id="brush-size" min="1" max="20" value="3" oninput="updateBrushSize(this.value)">
+                    <span style="font-size:11px;color:rgba(255,255,255,.7);min-width:16px" id="brush-size-label">3</span>
+                    <div class="canvas-divider"></div>
+                    <button class="canvas-tool-btn" onclick="undoCanvas()" title="撤销">↩</button>
+                    <button class="canvas-tool-btn" onclick="clearCanvas()" title="清除">🗑</button>
+                    <button class="canvas-tool-btn" onclick="saveAnnotation()" title="保存" style="background:rgba(255,255,255,.15)">💾</button>
+                    <div class="canvas-divider"></div>
+                    <button class="canvas-tool-btn" onclick="openPhotoModal('q3-original','第3题 · 原始照片')" title="查看原照片" style="font-size:12px">🔍原图</button>
+                    <button class="canvas-tool-btn" onclick="document.getElementById('upload-input').click()" title="重新上传" style="font-size:12px">📤上传</button>
                     <input type="file" id="upload-input" accept="image/*" style="display:none" onchange="handleUpload(event)">
                   </div>
-                  <div style="background:#fffef7;font-family:serif;position:relative">
+                  <!-- 切片内容 + Canvas 叠加层 -->
+                  <div id="q3-slice-wrap" style="position:relative;background:#fffef7;font-family:serif">
+                    <!-- 题目区 -->
                     <div style="background:#f0f9ff;border-bottom:1px dashed #bae6fd;padding:10px 16px">
                       <span style="font-size:11px;font-weight:600;color:#0284c7;display:block;margin-bottom:4px">[ 题目区 ]</span>
                       <span style="font-size:13px;color:#1e293b">解方程组：{ 3x+2y=16 和 x−y=2 }，并验证答案。（要求写出完整解题过程）</span>
                     </div>
+                    <!-- 答题区 -->
                     <div style="background:#fefce8;padding:10px 16px 16px">
                       <span style="font-size:11px;font-weight:600;color:#92400e;display:block;margin-bottom:10px">[ 答题区 ]</span>
                       <div style="font-size:14px;color:#1e293b;line-height:2.4">
@@ -1309,39 +1333,17 @@ input, select, textarea { font-family: var(--font); }
                         <span style="color:#ef4444;font-size:13px">（未写验证步骤）</span>
                       </div>
                     </div>
-                    <div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;background:repeating-linear-gradient(transparent,transparent 31px,#e8e4d0 31px,#e8e4d0 32px);opacity:.4"></div>
+                    <!-- 横线装饰（pointer-events:none 不干扰批注）-->
+                    <div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;background:repeating-linear-gradient(transparent,transparent 31px,#e8e4d0 31px,#e8e4d0 32px);opacity:.3"></div>
+                    <!-- 手写批注 Canvas 叠加层（直接覆盖在内容上）-->
+                    <canvas id="annotation-canvas"
+                      style="position:absolute;top:0;left:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair;z-index:10"
+                      onpointerdown="startDraw(event)" onpointermove="draw(event)" onpointerup="endDraw(event)" onpointerleave="endDraw(event)">
+                    </canvas>
                   </div>
                   <div style="font-size:11px;color:var(--gray-400);padding:6px 12px;background:var(--gray-50);border-top:1px solid var(--gray-100)">
-                    💡 切片完整展示题目区与答题区，防止 AI 裁切后对齐错位 · 如切片有误请点击"查看原照片"核对
+                    ✏️ 直接在学生答题区上批注 · 支持手写板压感 / 鼠标 / iPad 触控笔 · 如切片有误请点击"🔍原图"核对
                   </div>
-                </div>
-
-                <!-- Canvas annotation toolbar + canvas -->
-                <div style="margin-bottom:14px">
-                  <div style="font-size:12px;font-weight:500;color:var(--gray-600);margin-bottom:8px">✏️ 手写批注区（手写板 / 鼠标均可）</div>
-                  <div class="canvas-toolbar">
-                    <button class="canvas-tool-btn active" id="tool-pen" onclick="setTool('pen')" title="画笔">✏️</button>
-                    <button class="canvas-tool-btn" id="tool-eraser" onclick="setTool('eraser')" title="橡皮擦">⬜</button>
-                    <button class="canvas-tool-btn" id="tool-line" onclick="setTool('line')" title="直线">╱</button>
-                    <div class="canvas-divider"></div>
-                    <div class="canvas-color-btn active" style="background:#ef4444" onclick="setColor('#ef4444',this)" title="红色"></div>
-                    <div class="canvas-color-btn" style="background:#3b82f6" onclick="setColor('#3b82f6',this)" title="蓝色"></div>
-                    <div class="canvas-color-btn" style="background:#16a34a" onclick="setColor('#16a34a',this)" title="绿色"></div>
-                    <div class="canvas-color-btn" style="background:#f59e0b" onclick="setColor('#f59e0b',this)" title="橙色"></div>
-                    <div class="canvas-color-btn" style="background:#1e293b" onclick="setColor('#1e293b',this)" title="黑色"></div>
-                    <div class="canvas-divider"></div>
-                    <span class="canvas-size-label">粗细</span>
-                    <input type="range" class="canvas-size-input" id="brush-size" min="1" max="20" value="3" oninput="updateBrushSize(this.value)">
-                    <span style="font-size:11px;color:rgba(255,255,255,.7);min-width:20px" id="brush-size-label">3</span>
-                    <div class="canvas-divider"></div>
-                    <button class="canvas-tool-btn" onclick="undoCanvas()" title="撤销">↩</button>
-                    <button class="canvas-tool-btn" onclick="clearCanvas()" title="清除">🗑</button>
-                    <button class="canvas-tool-btn" onclick="saveAnnotation()" title="保存批注" style="background:rgba(255,255,255,.15)">💾</button>
-                  </div>
-                  <div class="canvas-wrap" id="canvas-wrap">
-                    <canvas id="annotation-canvas" width="700" height="320" style="width:100%;display:block;touch-action:none"></canvas>
-                  </div>
-                  <div style="font-size:11px;color:var(--gray-400);margin-top:6px">💡 支持手写板压感 · 鼠标 · 触控笔（iPad）</div>
                 </div>
 
                 <!-- AI 批改建议 -->
@@ -1438,19 +1440,39 @@ input, select, textarea { font-family: var(--font); }
                 </div>
 
                 <!-- 切片图区（完整展示） -->
-                <div class="slice-photo-container">
-                  <div class="slice-photo-toolbar">
-                    <span class="slice-photo-label">📷 AI 切片（含题目区 + 答题区，完整展示）</span>
-                    <span style="font-size:11px;color:var(--gray-400)">Q4 · 第4题</span>
-                    <button class="btn btn-xs btn-outline" style="margin-left:auto" onclick="openPhotoModal('q4-original','第4题 · 原始照片')">🔍 查看原照片</button>
-                    <button class="btn btn-xs btn-outline" onclick="document.getElementById('upload-input-2').click()">📤 重新上传</button>
+                <!-- 切片区 + 手写批注叠加展示 -->
+                <div class="slice-photo-container" style="margin-bottom:14px">
+                  <!-- 工具栏：切片信息 + 批注工具 -->
+                  <div class="canvas-toolbar" style="border-radius:8px 8px 0 0;flex-wrap:wrap;gap:6px">
+                    <span style="font-size:12px;font-weight:500;color:rgba(255,255,255,.9)">📷 AI 切片（题目区 + 答题区）</span>
+                    <span style="font-size:11px;color:rgba(255,255,255,.5)">Q4 · 第4题</span>
+                    <div style="flex:1"></div>
+                    <button class="canvas-tool-btn active" id="tool-pen-2" onclick="setTool2('pen')" title="画笔">✏️</button>
+                    <button class="canvas-tool-btn" id="tool-eraser-2" onclick="setTool2('eraser')" title="橡皮擦">⬜</button>
+                    <button class="canvas-tool-btn" id="tool-line-2" onclick="setTool2('line')" title="直线">╯</button>
+                    <div class="canvas-divider"></div>
+                    <div class="canvas-color-btn active" style="background:#ef4444" onclick="setColor2('#ef4444',this)" title="红色"></div>
+                    <div class="canvas-color-btn" style="background:#3b82f6" onclick="setColor2('#3b82f6',this)" title="蓝色"></div>
+                    <div class="canvas-color-btn" style="background:#16a34a" onclick="setColor2('#16a34a',this)" title="绿色"></div>
+                    <div class="canvas-color-btn" style="background:#f59e0b" onclick="setColor2('#f59e0b',this)" title="橙色"></div>
+                    <div class="canvas-color-btn" style="background:#1e293b" onclick="setColor2('#1e293b',this)" title="黑色"></div>
+                    <div class="canvas-divider"></div>
+                    <button class="canvas-tool-btn" onclick="undoCanvas2()" title="撤销">↩</button>
+                    <button class="canvas-tool-btn" onclick="clearCanvas2()" title="清除">🗑</button>
+                    <button class="canvas-tool-btn" onclick="saveAnnotation2()" title="保存" style="background:rgba(255,255,255,.15)">💾</button>
+                    <div class="canvas-divider"></div>
+                    <button class="canvas-tool-btn" onclick="openPhotoModal('q4-original','第4题 · 原始照片')" title="查看原照片" style="font-size:12px">🔍原图</button>
+                    <button class="canvas-tool-btn" onclick="document.getElementById('upload-input-2').click()" title="重新上传" style="font-size:12px">📤上传</button>
                     <input type="file" id="upload-input-2" accept="image/*" style="display:none" onchange="handleUpload2(event)">
                   </div>
-                  <div style="background:#fffef7;font-family:serif;position:relative">
+                  <!-- 切片内容 + Canvas 叠加层 -->
+                  <div id="q4-slice-wrap" style="position:relative;background:#fffef7;font-family:serif">
+                    <!-- 题目区 -->
                     <div style="background:#f0f9ff;border-bottom:1px dashed #bae6fd;padding:10px 16px">
                       <span style="font-size:11px;font-weight:600;color:#0284c7;display:block;margin-bottom:4px">[ 题目区 ]</span>
                       <span style="font-size:13px;color:#1e293b">已知两个正整数之和为 35，乘积为 306，求这两个正整数。</span>
                     </div>
+                    <!-- 答题区 -->
                     <div style="background:#fefce8;padding:10px 16px 16px">
                       <span style="font-size:11px;font-weight:600;color:#92400e;display:block;margin-bottom:10px">[ 答题区 ]</span>
                       <div style="font-size:14px;color:#1e293b;line-height:2.4">
@@ -1462,30 +1484,16 @@ input, select, textarea { font-family: var(--font); }
                         验证：18+17=35✓, 18×17=306✓
                       </div>
                     </div>
-                    <div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;background:repeating-linear-gradient(transparent,transparent 31px,#e8e4d0 31px,#e8e4d0 32px);opacity:.4"></div>
+                    <!-- 横线装饰 -->
+                    <div style="position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;background:repeating-linear-gradient(transparent,transparent 31px,#e8e4d0 31px,#e8e4d0 32px);opacity:.3"></div>
+                    <!-- 手写批注 Canvas 叠加层 -->
+                    <canvas id="annotation-canvas-2"
+                      style="position:absolute;top:0;left:0;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair;z-index:10"
+                      onpointerdown="startDraw2(event)" onpointermove="draw2(event)" onpointerup="endDraw2(event)" onpointerleave="endDraw2(event)">
+                    </canvas>
                   </div>
                   <div style="font-size:11px;color:var(--gray-400);padding:6px 12px;background:var(--gray-50);border-top:1px solid var(--gray-100)">
-                    💡 切片完整展示题目区与答题区
-                  </div>
-                </div>
-
-                <!-- 手写批注 Canvas -->
-                <div style="margin-bottom:14px">
-                  <div style="font-size:12px;font-weight:500;color:var(--gray-600);margin-bottom:8px">✏️ 手写批注区</div>
-                  <div class="canvas-toolbar">
-                    <button class="canvas-tool-btn active" onclick="setTool2('pen')">✏️</button>
-                    <button class="canvas-tool-btn" onclick="setTool2('eraser')">⬜</button>
-                    <div class="canvas-divider"></div>
-                    <div class="canvas-color-btn active" style="background:#ef4444" onclick="setColor2('#ef4444',this)"></div>
-                    <div class="canvas-color-btn" style="background:#3b82f6" onclick="setColor2('#3b82f6',this)"></div>
-                    <div class="canvas-color-btn" style="background:#16a34a" onclick="setColor2('#16a34a',this)"></div>
-                    <div class="canvas-color-btn" style="background:#f59e0b" onclick="setColor2('#f59e0b',this)"></div>
-                    <div class="canvas-divider"></div>
-                    <button class="canvas-tool-btn" onclick="clearCanvas2()">🗑</button>
-                    <button class="canvas-tool-btn" onclick="saveAnnotation2()">💾</button>
-                  </div>
-                  <div class="canvas-wrap">
-                    <canvas id="annotation-canvas-2" width="700" height="260" style="width:100%;display:block;touch-action:none"></canvas>
+                    ✏️ 直接在学生答题区上批注 · 支持手写板压感 / 鼠标 / iPad 触控笔 · 如切片有误请点击"🔍原图"核对
                   </div>
                 </div>
 
@@ -2244,21 +2252,13 @@ let sliceCanvasDrawn = false;
 function initHomeworkPage() {
   renderStudentList(currentFilter);
   selectStudent(currentStudentIdx);
-  initCanvas();
-  initCanvas2();
   drawStudentWork();
   drawStudentWork2();
-  // 切片Canvas必须在页面可见后才绘制，用requestAnimationFrame确保布局完成
+  // 所有Canvas必须在页面可见后才初始化，用双层rAF确保布局完成
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      drawSliceCanvas('q1-slice-canvas', {
-        question: 'If x+y=10 and xy=21, find x²+y²?  (A)58  (B)62  (C)79  (D)100',
-        answer: ['学生圈选答案：A  (58)', '', 'AI识别置信度: 97%']
-      }, true);
-      drawSliceCanvas('q2-slice-canvas', {
-        question: '2x+3y=12, x-y=1. Find x.  (A)2  (B)3  (C)4  (D)5',
-        answer: ['学生圈选答案：C  (4)  ← 错误', 'AI识别置信度: 94%', '正确答案应为: B (3)']
-      }, true);
+      initCanvas();
+      initCanvas2();
       sliceCanvasDrawn = true;
     });
   });
@@ -2488,11 +2488,20 @@ function getPos(canvas, e) {
 }
 
 function resizeCanvas(canvas, ctx) {
-  const rect = canvas.getBoundingClientRect();
-  if (rect.width > 0) {
+  const parent = canvas.parentElement;
+  if (!parent) return;
+  const rect = parent.getBoundingClientRect();
+  if (rect.width > 0 && rect.height > 0) {
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = rect.width * dpr;
-    canvas.height = canvas.height; // keep height
+    // Save current drawing
+    let imgData = null;
+    try { imgData = ctx.getImageData(0, 0, canvas.width, canvas.height); } catch(e) {}
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    // Scale context for HiDPI
+    ctx.scale(dpr, dpr);
+    // Restore drawing
+    if (imgData) { try { ctx.putImageData(imgData, 0, 0); } catch(e) {} }
   }
 }
 
