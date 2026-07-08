@@ -377,18 +377,27 @@ input, select, textarea { font-family: var(--font); }
 
 /* Slice photo display */
 .slice-photo-wrap {
-  border: 1px solid var(--gray-200); border-radius: 8px; background: #fffef7;
-  margin-bottom: 10px; overflow: hidden;
-  /* 完整显示，不隐藏内容，通过外层滚动处理 */
+  /* 切片图内容区，不设置 overflow 以免截断 Canvas */
+  background: #fffef7;
+  border-left: 1px solid var(--gray-200);
+  border-right: 1px solid var(--gray-200);
+  border-bottom: 1px solid var(--gray-200);
 }
 .slice-photo-canvas { width: 100%; display: block; }
 .slice-photo-toolbar {
   display: flex; align-items: center; gap: 8px; padding: 8px 12px;
-  background: var(--gray-50); border-bottom: 1px solid var(--gray-200);
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 8px 8px 0 0;
   flex-wrap: wrap;
 }
 .slice-photo-label { font-size: 12px; font-weight: 500; color: var(--gray-600); }
 .slice-photo-note { font-size: 11px; color: var(--gray-400); margin-left: auto; }
+/* 切片展示容器：包含 toolbar + canvas + footer */
+.slice-photo-container {
+  border: 1px solid var(--gray-200); border-radius: 8px; overflow: visible;
+  margin-bottom: 14px;
+}
 
 /* Error classification buttons (2nd level) */
 .error-level2 {
@@ -1080,16 +1089,14 @@ input, select, textarea { font-family: var(--font); }
                 </div>
 
                 <!-- 切片图区（含题目+答题区，完整展示不裁剪） -->
-                <div style="margin-bottom:14px">
+                <div class="slice-photo-container">
                   <div class="slice-photo-toolbar">
                     <span class="slice-photo-label">📷 AI 切片（含题目区 + 答题区）</span>
                     <span style="font-size:11px;color:var(--gray-400)">Q1 · 第1题</span>
                     <button class="btn btn-xs btn-outline" style="margin-left:auto" onclick="openPhotoModal('q1-original','第1题 · 原始照片')">🔍 查看原照片</button>
                   </div>
-                  <div class="slice-photo-wrap">
-                    <canvas id="q1-slice-canvas" style="width:100%;display:block;background:#fffef7"></canvas>
-                  </div>
-                  <div style="font-size:11px;color:var(--gray-400);padding:6px 12px;background:var(--gray-50);border-top:1px solid var(--gray-100);border-radius:0 0 8px 8px">
+                  <canvas id="q1-slice-canvas" width="700" height="200" style="width:100%;display:block;background:#fffef7"></canvas>
+                  <div style="font-size:11px;color:var(--gray-400);padding:6px 12px;background:var(--gray-50);border-top:1px solid var(--gray-100)">
                     💡 切片包含完整题目文字与学生答题区域，防止裁切错位
                   </div>
                 </div>
@@ -1160,16 +1167,14 @@ input, select, textarea { font-family: var(--font); }
                 </div>
 
                 <!-- 切片图区（完整展示，不裁剪） -->
-                <div style="margin-bottom:14px">
+                <div class="slice-photo-container">
                   <div class="slice-photo-toolbar">
                     <span class="slice-photo-label">📷 AI 切片（含题目区 + 答题区）</span>
                     <span style="font-size:11px;color:var(--gray-400)">Q2 · 第2题</span>
                     <button class="btn btn-xs btn-outline" style="margin-left:auto" onclick="openPhotoModal('q2-original','第2题 · 原始照片')">🔍 查看原照片</button>
                   </div>
-                  <div class="slice-photo-wrap">
-                    <canvas id="q2-slice-canvas" style="width:100%;display:block;background:#fffef7"></canvas>
-                  </div>
-                  <div style="font-size:11px;color:var(--gray-400);padding:6px 12px;background:var(--gray-50);border-top:1px solid var(--gray-100);border-radius:0 0 8px 8px">
+                  <canvas id="q2-slice-canvas" width="700" height="200" style="width:100%;display:block;background:#fffef7"></canvas>
+                  <div style="font-size:11px;color:var(--gray-400);padding:6px 12px;background:var(--gray-50);border-top:1px solid var(--gray-100)">
                     💡 切片包含完整题目文字与学生答题区域
                   </div>
                 </div>
@@ -1253,7 +1258,7 @@ input, select, textarea { font-family: var(--font); }
                 </div>
 
                 <!-- 切片图区（完整展示，不裁剪，含题目+答题区） -->
-                <div style="margin-bottom:14px">
+                <div class="slice-photo-container">
                   <div class="slice-photo-toolbar">
                     <span class="slice-photo-label">📷 AI 切片（含题目区 + 答题区，完整展示）</span>
                     <span style="font-size:11px;color:var(--gray-400)">Q3 · 第3题</span>
@@ -1261,11 +1266,8 @@ input, select, textarea { font-family: var(--font); }
                     <button class="btn btn-xs btn-outline" onclick="document.getElementById('upload-input').click()">📤 重新上传</button>
                     <input type="file" id="upload-input" accept="image/*" style="display:none" onchange="handleUpload(event)">
                   </div>
-                  <!-- 完整展示，不隐藏上下内容，通过页面滚动查看 -->
-                  <div class="slice-photo-wrap" id="student-work-wrap">
-                    <canvas id="student-work-canvas" width="700" height="380" style="width:100%;display:block;background:#fffef7"></canvas>
-                  </div>
-                  <div style="font-size:11px;color:var(--gray-400);padding:6px 12px;background:var(--gray-50);border-top:1px solid var(--gray-100);border-radius:0 0 8px 8px">
+                  <canvas id="student-work-canvas" width="700" height="380" style="width:100%;display:block;background:#fffef7"></canvas>
+                  <div style="font-size:11px;color:var(--gray-400);padding:6px 12px;background:var(--gray-50);border-top:1px solid var(--gray-100)">
                     💡 切片完整展示题目区与答题区，防止 AI 裁切后对齐错位 · 如切片有误请点击"查看原照片"核对
                   </div>
                 </div>
@@ -1392,7 +1394,7 @@ input, select, textarea { font-family: var(--font); }
                 </div>
 
                 <!-- 切片图区（完整展示） -->
-                <div style="margin-bottom:14px">
+                <div class="slice-photo-container">
                   <div class="slice-photo-toolbar">
                     <span class="slice-photo-label">📷 AI 切片（含题目区 + 答题区，完整展示）</span>
                     <span style="font-size:11px;color:var(--gray-400)">Q4 · 第4题</span>
@@ -1400,10 +1402,8 @@ input, select, textarea { font-family: var(--font); }
                     <button class="btn btn-xs btn-outline" onclick="document.getElementById('upload-input-2').click()">📤 重新上传</button>
                     <input type="file" id="upload-input-2" accept="image/*" style="display:none" onchange="handleUpload2(event)">
                   </div>
-                  <div class="slice-photo-wrap">
-                    <canvas id="student-work-canvas-2" width="700" height="320" style="width:100%;display:block;background:#fffef7"></canvas>
-                  </div>
-                  <div style="font-size:11px;color:var(--gray-400);padding:6px 12px;background:var(--gray-50);border-top:1px solid var(--gray-100);border-radius:0 0 8px 8px">
+                  <canvas id="student-work-canvas-2" width="700" height="320" style="width:100%;display:block;background:#fffef7"></canvas>
+                  <div style="font-size:11px;color:var(--gray-400);padding:6px 12px;background:var(--gray-50);border-top:1px solid var(--gray-100)">
                     💡 切片完整展示题目区与答题区
                   </div>
                 </div>
