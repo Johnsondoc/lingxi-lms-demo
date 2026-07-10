@@ -921,177 +921,174 @@
     <!-- 主内容区 -->
     <div class="main-content">
         <!-- 首页仪表盘 -->
-        <div class="page active" id="dashboard">
-            <div class="page-body">
-                <div class="welcome-banner">
-                    <div>
-                        <h2>早上好，李助教 👋</h2>
-                        <p>今天是 2026年7月2日（周三） · 您有 3 份作业待批改 · AMC 8 基础班今日 19:00 上课</p>
-                    </div>
-                    <div class="quick-actions">
-                        <button class="quick-btn" onclick="showPage('class-assignments')">📂 查看作业</button>
-                        <button class="quick-btn" onclick="showPage('publish-task')">✏️ 发布任务</button>
-                        <button class="quick-btn" onclick="showPage('analytics')">📊 查看数据</button>
-                    </div>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="label">本周待批改作业</div>
-                        <div class="value">3</div>
-                        <div class="unit">份 · ⚠ 待处理</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">学生平均完成率</div>
-                        <div class="value">76%</div>
-                        <div class="unit">↓ 低于目标</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">我的班级数</div>
-                        <div class="value">3</div>
-                        <div class="unit">个班级</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">待通知学生</div>
-                        <div class="value">5</div>
-                        <div class="unit">人 · 未完成</div>
-                    </div>
-                </div>
-
-                <div class="class-cards">
-                    <div class="class-card">
-                        <div class="class-card-header">
-                            <div class="class-card-title">AMC 8 基础班</div>
-                            <div class="class-card-info">18 名学生 · 共 12 节课 · 已完成 4 节</div>
-                        </div>
-                        <div class="class-card-body">
-                            <div class="progress-item">
-                                <div class="progress-label">
-                                    <span>课程进度</span>
-                                    <span>33%</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 33%"></div>
-                                </div>
-                            </div>
-                            <div class="progress-item">
-                                <div class="progress-label">
-                                    <span>作业完成率</span>
-                                    <span>78%</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 78%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="class-card-footer">
-                            <button onclick="showPage('class-assignments')">查看作业</button>
-                            <button onclick="showPage('publish-task')">发布任务</button>
-                            <button onclick="showPage('analytics')">查看数据</button>
-                        </div>
-                    </div>
-
-                    <div class="class-card">
-                        <div class="class-card-header">
-                            <div class="class-card-title">AMC 8 强化班</div>
-                            <div class="class-card-info">22 名学生 · 共 12 节课 · 已完成 4 节</div>
-                        </div>
-                        <div class="class-card-body">
-                            <div class="progress-item">
-                                <div class="progress-label">
-                                    <span>课程进度</span>
-                                    <span>33%</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 33%"></div>
-                                </div>
-                            </div>
-                            <div class="progress-item">
-                                <div class="progress-label">
-                                    <span>作业完成率</span>
-                                    <span>82%</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 82%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="class-card-footer">
-                            <button onclick="showPage('class-assignments')">查看作业</button>
-                            <button onclick="showPage('publish-task')">发布任务</button>
-                            <button onclick="showPage('analytics')">查看数据</button>
-                        </div>
-                    </div>
-
-                    <div class="class-card">
-                        <div class="class-card-header">
-                            <div class="class-card-title">AMC 10 冲刺班</div>
-                            <div class="class-card-info">15 名学生 · 共 10 节课 · 开课日期 7月15日</div>
-                        </div>
-                        <div class="class-card-body">
-                            <div class="progress-item">
-                                <div class="progress-label">
-                                    <span>课程进度</span>
-                                    <span>0%</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 0%"></div>
-                                </div>
-                            </div>
-                            <div class="progress-item">
-                                <div class="progress-label">
-                                    <span>状态</span>
-                                    <span>待开课</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="class-card-footer">
-                            <button onclick="showPage('publish-task')">准备课件</button>
-                            <button onclick="showPage('publish-task')">下发任务</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="todo-section">
-                    <div class="section-title">待处理事项</div>
-                    <div class="todo-list">
-                        <div class="todo-item">
-                            <div class="todo-content">
-                                <div class="todo-title">AMC 8 基础班 · 第4课作业 待批改</div>
-                                <div class="todo-desc">18 份提交 · 已批改 5 份 · 截止时间 今日 23:59</div>
-                            </div>
-                            <button class="todo-action" onclick="showPage('class-assignments')">立即批改</button>
-                        </div>
-                        <div class="todo-item">
-                            <div class="todo-content">
-                                <div class="todo-title">AMC 8 强化班 · 第4课作业 待批改</div>
-                                <div class="todo-desc">22 份提交 · 已批改 12 份 · 截止时间 明日 23:59</div>
-                            </div>
-                            <button class="todo-action" onclick="showPage('class-assignments')">继续批改</button>
-                        </div>
-                        <div class="todo-item">
-                            <div class="todo-content">
-                                <div class="todo-title">AMC 10 冲刺班 · 第1节课件 待上传</div>
-                                <div class="todo-desc">开课日期 7月15日 · 建议提前3天上传</div>
-                            </div>
-                            <button class="todo-action" onclick="showPage('publish-task')">上传课件</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="ai-suggestion">
-                    <div class="ai-suggestion-title">🤖 AI 教学建议</div>
-                    <div class="ai-suggestion-content">
-                        📌 <strong>AMC8基础班 · 第3课代数正确率 52%</strong><br>
-                        建议：本周补发2道代数专项练习题，重点针对方程组解法。
-                    </div>
-                    <button class="ai-suggestion-action" onclick="showPage('publish-task')">查看建议 →</button>
-                </div>
-            </div>
+        <div class="page" id="dashboard">
+  <div class="app-body">
+    <div class="app-content">
+      <!-- Welcome Banner -->
+      <div class="welcome-banner">
+        <div class="welcome-text">
+          <h2>早上好，李助教 👋</h2>
+          <p>今天是 2026年7月2日（周三）· 您有 5 份作业待批改 · AMC 8 基础班今日 19:00 上课</p>
         </div>
+        <div class="welcome-actions">
+          <button class="welcome-btn" onclick="showPage('courseware')">📂 打开课件</button>
+          <button class="welcome-btn" onclick="showPage('homework')">✏️ 批改作业</button>
+          <button class="welcome-btn" onclick="showPage('students')">📊 查看数据</button>
+        </div>
+      </div>
 
-        <!-- 班级作业管理 -->
-        <div class="page" id="class-assignments">
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card stat-card-blue">
+          <div class="stat-label">本周待批改作业</div>
+          <div class="stat-value stat-value-blue">3 <span class="stat-unit">份</span></div>
+          <div><span class="badge badge-yellow">⚠ 待处理</span></div>
+        </div>
+        <div class="stat-card stat-card-green">
+          <div class="stat-label">今日需要批改班级</div>
+          <div class="stat-value stat-value-green">3 <span class="stat-unit">个班</span></div>
+          <div class="stat-sub">AMC8基础班 · AMC8强化班 · AMC10冲刺班</div>
+        </div>
+        <div class="stat-card stat-card-purple">
+          <div class="stat-label">本周批改完成率</div>
+          <div class="stat-value stat-value-purple">85 <span class="stat-unit">%</span></div>
+          <div><span class="badge badge-green">✓ 进度良好</span></div>
+        </div>
+        <div class="stat-card stat-card-orange">
+          <div class="stat-label">🤖 AI 教学建议</div>
+          <div class="stat-ai-text">📌 张三同学几何掌握率偏低(52%)，建议发送补充练习题</div>
+          <div class="stat-ai-btn"><button class="btn btn-xs btn-primary" onclick="showPage('ai')">查看建议 →</button></div>
+        </div>
+      </div>
+
+      <!-- Classes -->
+      <div class="section-header">
+        <div class="section-title" style="margin:0">我的班级</div>
+        <span class="link-more">查看全部 →</span>
+      </div>
+      <div class="classes-grid">
+        <!-- AMC8 基础 -->
+        <div class="class-card">
+          <div class="class-card-top" style="background:#3b82f6"></div>
+          <div class="class-card-body">
+            <div class="class-card-header">
+              <span class="class-name">AMC 8 基础班</span>
+              <span class="badge badge-blue">进行中</span>
+            </div>
+            <div class="class-meta">18 名学生 · 共 12 节课 · 已完成 4 节</div>
+            <div class="progress-row">
+              <div class="progress-bar-wrap"><div class="progress-bar" style="width:33%;background:#3b82f6"></div></div>
+              <div class="progress-labels"><span>课程进度 33%</span><span>作业完成率 78%</span></div>
+            </div>
+            <div class="class-actions">
+              <button class="btn btn-primary btn-sm" onclick="showPage('courseware')">打开课件</button>
+              <button class="btn btn-outline btn-sm" onclick="showPage('homework')">批改作业</button>
+              <button class="btn btn-outline btn-sm" onclick="showPage('students')">学生数据</button>
+            </div>
+          </div>
+        </div>
+        <!-- AMC8 强化 -->
+        <div class="class-card">
+          <div class="class-card-top" style="background:#8b5cf6"></div>
+          <div class="class-card-body">
+            <div class="class-card-header">
+              <span class="class-name">AMC 8 强化班</span>
+              <span class="badge badge-purple">进行中</span>
+            </div>
+            <div class="class-meta">22 名学生 · 共 12 节课 · 已完成 4 节</div>
+            <div class="progress-row">
+              <div class="progress-bar-wrap"><div class="progress-bar" style="width:33%;background:#8b5cf6"></div></div>
+              <div class="progress-labels"><span>课程进度 33%</span><span>作业完成率 82%</span></div>
+            </div>
+            <div class="class-actions">
+              <button class="btn btn-sm" style="background:#7c3aed;color:#fff" onclick="showPage('courseware')">打开课件</button>
+              <button class="btn btn-outline btn-sm" onclick="showPage('homework')">批改作业</button>
+              <button class="btn btn-outline btn-sm" onclick="showPage('students')">学生数据</button>
+            </div>
+          </div>
+        </div>
+        <!-- AMC10 冲刺 -->
+        <div class="class-card">
+          <div class="class-card-top" style="background:#f59e0b"></div>
+          <div class="class-card-body">
+            <div class="class-card-header">
+              <span class="class-name">AMC 10 冲刺班</span>
+              <span class="badge badge-yellow">即将开始</span>
+            </div>
+            <div class="class-meta">15 名学生 · 共 10 节课 · 开课日期 7月15日</div>
+            <div class="progress-row">
+              <div class="progress-bar-wrap"><div class="progress-bar" style="width:0%;background:#f59e0b"></div></div>
+              <div class="progress-labels"><span>课程进度 0%</span><span>待开课</span></div>
+            </div>
+            <div class="class-actions">
+              <button class="btn btn-sm" style="background:#d97706;color:#fff" onclick="showPage('courseware')">准备课件</button>
+              <button class="btn btn-outline btn-sm" onclick="showPage('tasks')">下发任务</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom: Pending + AI -->
+      <div class="bottom-grid">
+        <div>
+          <div class="section-title">待处理事项</div>
+          <div class="pending-list">
+            <div class="pending-item">
+              <div class="pending-stripe" style="background:var(--danger)"></div>
+              <div class="pending-content">
+                <div class="pending-title">AMC 8 基础班 · 第4课作业 待批改</div>
+                <div class="pending-meta">18 份提交 · 已批改 5 份 · 截止时间 今日 23:59</div>
+              </div>
+              <div class="pending-action"><button class="btn btn-danger btn-sm" onclick="showPage('homework')">立即批改</button></div>
+            </div>
+            <div class="pending-item">
+              <div class="pending-stripe" style="background:var(--warning)"></div>
+              <div class="pending-content">
+                <div class="pending-title">AMC 8 强化班 · 第4课作业 待批改</div>
+                <div class="pending-meta">22 份提交 · 已批改 12 份 · 截止时间 明日 23:59</div>
+              </div>
+              <div class="pending-action"><button class="btn btn-sm" style="background:var(--warning);color:#fff" onclick="showPage('homework')">继续批改</button></div>
+            </div>
+            <div class="pending-item">
+              <div class="pending-stripe" style="background:var(--primary)"></div>
+              <div class="pending-content">
+                <div class="pending-title">AMC 10 冲刺班 · 第1节课件 待上传</div>
+                <div class="pending-meta">开课日期 7月15日 · 建议提前3天上传</div>
+              </div>
+              <div class="pending-action"><button class="btn btn-outline btn-sm" onclick="showPage('courseware')">上传课件</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="ai-panel">
+          <div class="ai-panel-title">🤖 AI 教学建议 <span class="link-more" onclick="showPage('ai')">查看全部</span></div>
+          <div class="ai-item">
+            <div class="ai-item-title">📌 AMC8基础班 · 张三同学几何掌握率 52%</div>
+            <div class="ai-item-desc">建议：发送该学生几何专项练习题，重点针对图形计算。</div>
+          </div>
+          <div class="ai-item">
+            <div class="ai-item-title">✅ 李四同学 · 整体表现良好</div>
+            <div class="ai-item-desc">作业完成率 95%，建议继续保持学习进度。</div>
+          </div>
+          <div class="ai-footer">由 AI 分析生成 · 仅供参考</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ===== ORIGINAL PHOTO MODAL ===== -->
+<div class="photo-modal" id="photo-modal" onclick="closePhotoModal(event)">
+  <div class="photo-modal-inner">
+    <button class="photo-modal-close" onclick="closePhotoModal(null,true)">✕</button>
+    <canvas id="photo-modal-canvas" style="max-width:90vw;max-height:80vh;display:block"></canvas>
+    <div class="photo-modal-label">
+      <span id="photo-modal-title">原始照片</span>
+      <span style="color:rgba(255,255,255,.5)">点击空白处关闭</span>
+    </div>
+  </div>
+</div>
+
+
+<div class="page" id="class-assignments">
             <div class="page-header">
                 <h1>班级作业管理</h1>
                 <p>查看班级学生的作业完成情况，批改作业并发送家长链接</p>
