@@ -807,12 +807,12 @@ input, select, textarea { font-family: var(--font); }
     <span class="nav-logo-badge" style="font-size:11px;color:#64748b;margin-left:6px;">老师端</span>
   </div>
   <div class="nav-items">
-    <button class="nav-item active" onclick="showPage('dashboard')">首页</button>
-    <button class="nav-item" onclick="showPage('homework')">作业批改</button>
-    <button class="nav-item" onclick="showPage('courseware')">课件管理</button>
-    <button class="nav-item" onclick="showPage('students')">学生数据</button>
-    <button class="nav-item" onclick="showPage('tasks')">任务下发</button>
-    <button class="nav-item" onclick="showPage('ai')">AI 建议</button>
+    <button class="nav-item active" onclick="showPage('page-dashboard')">首页</button>
+    <button class="nav-item" onclick="showPage('page-homework')">作业批改</button>
+    <button class="nav-item" onclick="showPage('page-class-assignments')">课件管理</button>
+    <button class="nav-item" onclick="showPage('page-student-profile')">学生数据</button>
+    <button class="nav-item" onclick="showPage('page-publish-task')">任务下发</button>
+    <button class="nav-item" onclick="showPage('page-analytics')">AI 建议</button>
   </div>
   <div class="nav-right">
     <button class="nav-bell" onclick="showToast('暂无新通知')">🔔<span class="nav-bell-dot"></span></button>
@@ -834,9 +834,9 @@ input, select, textarea { font-family: var(--font); }
           <p>今天是 2026年7月2日（周三）· 您有 5 份作业待批改 · AMC 8 基础班今日 19:00 上课</p>
         </div>
         <div class="welcome-actions">
-          <button class="welcome-btn" onclick="showPage('courseware')">📂 打开课件</button>
-          <button class="welcome-btn" onclick="showPage('homework')">✏️ 批改作业</button>
-          <button class="welcome-btn" onclick="showPage('students')">📊 查看数据</button>
+          <button class="welcome-btn" onclick="showPage('page-class-assignments')">📂 打开课件</button>
+          <button class="welcome-btn" onclick="showPage('page-homework')">✏️ 批改作业</button>
+          <button class="welcome-btn" onclick="showPage('page-student-profile')">📊 查看数据</button>
         </div>
       </div>
 
@@ -860,7 +860,7 @@ input, select, textarea { font-family: var(--font); }
         <div class="stat-card stat-card-orange">
           <div class="stat-label">🤖 AI 教学建议</div>
           <div class="stat-ai-text">📌 第3课"代数"正确率偏低(52%)，建议加强练习，下发补充题目</div>
-          <div class="stat-ai-btn"><button class="btn btn-xs btn-primary" onclick="showPage('ai')">查看建议 →</button></div>
+          <div class="stat-ai-btn"><button class="btn btn-xs btn-primary" onclick="showPage('page-analytics')">查看建议 →</button></div>
         </div>
       </div>
 
@@ -884,9 +884,9 @@ input, select, textarea { font-family: var(--font); }
               <div class="progress-labels"><span>课程进度 33%</span><span>作业完成率 78%</span></div>
             </div>
             <div class="class-actions">
-              <button class="btn btn-primary btn-sm" onclick="showPage('courseware')">打开课件</button>
-              <button class="btn btn-outline btn-sm" onclick="showPage('homework')">批改作业</button>
-              <button class="btn btn-outline btn-sm" onclick="showPage('students')">学生数据</button>
+              <button class="btn btn-primary btn-sm" onclick="showPage('page-class-assignments')">打开课件</button>
+              <button class="btn btn-outline btn-sm" onclick="showPage('page-homework')">批改作业</button>
+              <button class="btn btn-outline btn-sm" onclick="showPage('page-student-profile')">学生数据</button>
             </div>
           </div>
         </div>
@@ -904,9 +904,9 @@ input, select, textarea { font-family: var(--font); }
               <div class="progress-labels"><span>课程进度 33%</span><span>作业完成率 82%</span></div>
             </div>
             <div class="class-actions">
-              <button class="btn btn-sm" style="background:#7c3aed;color:#fff" onclick="showPage('courseware')">打开课件</button>
-              <button class="btn btn-outline btn-sm" onclick="showPage('homework')">批改作业</button>
-              <button class="btn btn-outline btn-sm" onclick="showPage('students')">学生数据</button>
+              <button class="btn btn-sm" style="background:#7c3aed;color:#fff" onclick="showPage('page-class-assignments')">打开课件</button>
+              <button class="btn btn-outline btn-sm" onclick="showPage('page-homework')">批改作业</button>
+              <button class="btn btn-outline btn-sm" onclick="showPage('page-student-profile')">学生数据</button>
             </div>
           </div>
         </div>
@@ -924,8 +924,8 @@ input, select, textarea { font-family: var(--font); }
               <div class="progress-labels"><span>课程进度 0%</span><span>待开课</span></div>
             </div>
             <div class="class-actions">
-              <button class="btn btn-sm" style="background:#d97706;color:#fff" onclick="showPage('courseware')">准备课件</button>
-              <button class="btn btn-outline btn-sm" onclick="showPage('tasks')">下发任务</button>
+              <button class="btn btn-sm" style="background:#d97706;color:#fff" onclick="showPage('page-class-assignments')">准备课件</button>
+              <button class="btn btn-outline btn-sm" onclick="showPage('page-publish-task')">下发任务</button>
             </div>
           </div>
         </div>
@@ -942,7 +942,7 @@ input, select, textarea { font-family: var(--font); }
                 <div class="pending-title">AMC 8 基础班 · 第4课作业 待批改</div>
                 <div class="pending-meta">18 份提交 · 已批改 5 份 · 截止时间 今日 23:59</div>
               </div>
-              <div class="pending-action"><button class="btn btn-danger btn-sm" onclick="showPage('homework')">立即批改</button></div>
+              <div class="pending-action"><button class="btn btn-danger btn-sm" onclick="showPage('page-homework')">立即批改</button></div>
             </div>
             <div class="pending-item">
               <div class="pending-stripe" style="background:var(--warning)"></div>
@@ -950,7 +950,7 @@ input, select, textarea { font-family: var(--font); }
                 <div class="pending-title">AMC 8 强化班 · 第4课作业 待批改</div>
                 <div class="pending-meta">22 份提交 · 已批改 12 份 · 截止时间 明日 23:59</div>
               </div>
-              <div class="pending-action"><button class="btn btn-sm" style="background:var(--warning);color:#fff" onclick="showPage('homework')">继续批改</button></div>
+              <div class="pending-action"><button class="btn btn-sm" style="background:var(--warning);color:#fff" onclick="showPage('page-homework')">继续批改</button></div>
             </div>
             <div class="pending-item">
               <div class="pending-stripe" style="background:var(--primary)"></div>
@@ -958,12 +958,12 @@ input, select, textarea { font-family: var(--font); }
                 <div class="pending-title">AMC 10 冲刺班 · 第1节课件 待上传</div>
                 <div class="pending-meta">开课日期 7月15日 · 建议提前3天上传</div>
               </div>
-              <div class="pending-action"><button class="btn btn-outline btn-sm" onclick="showPage('courseware')">上传课件</button></div>
+              <div class="pending-action"><button class="btn btn-outline btn-sm" onclick="showPage('page-class-assignments')">上传课件</button></div>
             </div>
           </div>
         </div>
         <div class="ai-panel">
-          <div class="ai-panel-title">🤖 AI 教学建议 <span class="link-more" onclick="showPage('ai')">查看全部</span></div>
+          <div class="ai-panel-title">🤖 AI 教学建议 <span class="link-more" onclick="showPage('page-analytics')">查看全部</span></div>
           <div class="ai-item">
             <div class="ai-item-title">📌 AMC8基础班 · 第3课代数正确率 52%</div>
             <div class="ai-item-desc">建议：本周补发2道代数专项练习题，重点针对方程组解法。</div>
@@ -1869,7 +1869,7 @@ function doLogin() {
   setTimeout(() => {
     document.getElementById('page-login').classList.remove('active');
     document.getElementById('app-nav').style.display = 'flex';
-    showPage('dashboard');
+    showPage('page-dashboard');
   }, 800);
 }
 
@@ -2581,7 +2581,7 @@ function handleUpload2(e) {
 
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded', () => {
-  // 切片Canvas在showPage('homework')时才绘制，此处不需要调用
+  // 切片Canvas在showPage('page-homework')时才绘制，此处不需要调用
   // drawStudentWork 也在 initHomeworkPage 里调用，此处无需重复
 });
 </script>
