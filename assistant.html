@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>凌犀 LMS · 助教驾驶舱</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        /* ===== 登录页样式 ===== */
+        .login-container {
+            display: flex;
+            height: 100vh;
+            background: linear-gradient(135deg, #2563EB 0%, #1e40af 100%);
+        }
+
+        .login-brand {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 60px;
+            color: white;
+        }
+
+        .login-brand img {
+            max-width: 680px;
+            width: 100%;
+            display: block;
+            margin-bottom: 40px;
+            filter: drop-shadow(0 2px 12px rgba(0,0,0,0.25));
+        }
+
+        .login-brand h1 {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 20px;
+        }
+
+        .login-brand p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .login-brand .features {
+            display: flex;
+            gap: 20px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .login-brand .feature-tag {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-form-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 40px;
+        }
+
+        .login-form {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-form h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+
+        .login-form .subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .form-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+            color: #6b7280;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .form-tab.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .form-checkbox input {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .form-checkbox label {
+            margin: 0;
+            cursor: pointer;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password a {
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .login-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 10px;
+            position: relative;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .sso-btn {
+            width: 100%;
+            padding: 12px;
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .sso-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .login-footer a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        /* ===== 主应用样式 ===== */
+        .app-container {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .app-container.active {
+            display: flex;
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0 30px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            text-decoration: none;
+        }
+
+        .navbar-logo img {
+            height: 48px;
+            width: auto;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 5px;
+        }
+
+        .navbar-menu button {
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #6b7280;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .navbar-menu button:hover,
+        .navbar-menu button.active {
+            background: #f3f4f6;
+            color: #2563eb;
+        }
+
+        .navbar-center {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .class-selector {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .navbar-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            position: relative;
+        }
+
+        .navbar-icon.notification::after {
+            content: '3';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .page {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        .page-header {
+            padding: 30px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .page-body {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* 仪表盘样式 */
+        .welcome-banner {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome-banner h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .welcome-banner p {
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .quick-btn {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .quick-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* 数据卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #2563eb;
+        }
+
+        .stat-card .label {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .unit {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        /* 班级卡片 */
+        .class-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .class-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .class-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #2563eb;
+        }
+
+        .class-card-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background: linear-gradient(135deg, #f0f9ff 0%, #f0f4ff 100%);
+        }
+
+        .class-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .class-card-info {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .class-card-body {
+            padding: 20px;
+        }
+
+        .progress-item {
+            margin-bottom: 15px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb, #1e40af);
+            transition: width 0.3s;
+        }
+
+        .class-card-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 10px;
+        }
+
+        .class-card-footer button {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .class-card-footer button:hover {
+            background: #f3f4f6;
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        /* 待处理事项 */
+        .todo-section {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+
+        .todo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .todo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .todo-content {
+            flex: 1;
+        }
+
+        .todo-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .todo-desc {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .todo-action {
+            padding: 8px 16px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.3s;
+        }
+
+        .todo-action:hover {
+            background: #1d4ed8;
+        }
+
+        /* AI建议面板 */
+        .ai-suggestion {
+            background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%);
+            border-radius: 12px;
+            border: 1px solid #fcd34d;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .ai-suggestion-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 15px;
+        }
+
+        .ai-suggestion-content {
+            font-size: 14px;
+            color: #78350f;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .ai-suggestion-action {
+            padding: 8px 16px;
+            background: #f59e0b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.3s;
+        }
+
+        .ai-suggestion-action:hover {
+            background: #d97706;
+        }
+
+        /* 通用按钮 */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #1f2937;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1024px) {
+            .navbar {
+                padding: 0 20px;
+            }
+
+            .page-header {
+                padding: 20px;
+            }
+
+            .page-body {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .class-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+            }
+
+            .login-brand {
+                padding: 30px;
+                justify-content: flex-start;
+                padding-top: 40px;
+            }
+
+            .login-brand h1 {
+                font-size: 32px;
+            }
+
+            .login-form-container {
+                padding: 20px;
+            }
+
+            .navbar-menu {
+                display: none;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .quick-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .quick-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 登录页 -->
+<div class="login-container" id="loginPage">
+    <div class="login-brand">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 100'%3E%3Ctext x='50' y='70' font-size='60' font-weight='bold' fill='white' font-family='Arial'%3EREKNOW%3C/text%3E%3Ctext x='50' y='90' font-size='16' fill='white' font-family='Arial'%3E凌犀 Ai LMS%3C/text%3E%3C/svg%3E" alt="REKNOW">
+        <h1>AI 驱动的教学管理<br>让每一节课产生价值</h1>
+        <p>学 · 练 · 测 · 析 全流程闭环，数据驱动持续优化</p>
+        <div class="features">
+            <div class="feature-tag">📊 智能数据分析</div>
+            <div class="feature-tag">🤖 AI 批改建议</div>
+            <div class="feature-tag">📚 课件标准化</div>
+            <div class="feature-tag">👨‍👩‍👧 多端协同</div>
+        </div>
+    </div>
+
+    <div class="login-form-container">
+        <form class="login-form" onsubmit="handleLogin(event)">
+            <h2>助教驾驶舱登录</h2>
+            <p class="subtitle">使用工号登录您的助教账号</p>
+
+            <div class="form-tabs">
+                <button type="button" class="form-tab active" onclick="switchTab(0)">工号登录</button>
+                <button type="button" class="form-tab" onclick="switchTab(1)">手机验证码</button>
+            </div>
+
+            <div class="form-group">
+                <label for="login-id">工号</label>
+                <input type="text" id="login-id" placeholder="请输入工号（如 A2024001）" value="A2024001" required>
+            </div>
+
+            <div class="form-group">
+                <label for="login-pwd">密码</label>
+                <input type="password" id="login-pwd" placeholder="请输入密码" value="123456" required>
+            </div>
+
+            <div class="form-checkbox">
+                <input type="checkbox" id="remember" checked>
+                <label for="remember">记住登录状态（7天）</label>
+            </div>
+
+            <div class="forgot-password">
+                <a href="#">忘记密码？</a>
+            </div>
+
+            <button type="submit" class="login-btn">登 录</button>
+
+            <div class="divider"><span>或</span></div>
+
+            <button type="button" class="sso-btn">🔐 企业 SSO 单点登录</button>
+
+            <div class="login-footer">
+                登录即代表您同意 <a href="#">《用户协议》</a> 和 <a href="#">《隐私政策》</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 主应用 -->
+<div class="app-container" id="appContainer">
+    <!-- 顶部导航栏 -->
+    <div class="navbar">
+        <div class="navbar-left">
+            <a href="#" class="navbar-logo" onclick="showPage('dashboard')">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 50'%3E%3Ctext x='10' y='35' font-size='28' font-weight='bold' fill='%232563eb' font-family='Arial'%3EREKNOW%3C/text%3E%3Ctext x='10' y='48' font-size='10' fill='%232563eb' font-family='Arial'%3E凌犀 Ai LMS%3C/text%3E%3C/svg%3E" alt="REKNOW">
+                <span>助教端</span>
+            </a>
+            <div class="navbar-menu">
+                <button onclick="showPage('dashboard')" class="active">首页</button>
+                <button onclick="showPage('class-assignments')">班级作业</button>
+                <button onclick="showPage('publish-task')">发布任务</button>
+                <button onclick="showPage('student-profile')">学生档案</button>
+                <button onclick="showPage('messages')">消息中心</button>
+                <button onclick="showPage('course-library')">课程库</button>
+                <button onclick="showPage('analytics')">数据分析</button>
+                <button onclick="showPage('announcements')">班级公告</button>
+                <button onclick="showPage('parent-communication')">家长沟通</button>
+            </div>
+        </div>
+
+        <div class="navbar-center">
+            <select class="class-selector" id="classSelector" onchange="changeClass()">
+                <option value="class1">AMC 8 基础班</option>
+                <option value="class2">AMC 8 强化班</option>
+                <option value="class3">AMC 10 冲刺班</option>
+            </select>
+        </div>
+
+        <div class="navbar-right">
+            <button class="navbar-icon notification" title="消息">🔔</button>
+            <div class="user-menu" onclick="toggleUserMenu()">
+                <div class="user-avatar">李</div>
+                <span>李助教</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <!-- 首页仪表盘 -->
+        <div class="page active" id="dashboard">
+            <div class="page-body">
+                <div class="welcome-banner">
+                    <div>
+                        <h2>早上好，李助教 👋</h2>
+                        <p>今天是 2026年7月2日（周三） · 您有 3 份作业待批改 · AMC 8 基础班今日 19:00 上课</p>
+                    </div>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="showPage('class-assignments')">📂 查看作业</button>
+                        <button class="quick-btn" onclick="showPage('publish-task')">✏️ 发布任务</button>
+                        <button class="quick-btn" onclick="showPage('analytics')">📊 查看数据</button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="label">本周待批改作业</div>
+                        <div class="value">3</div>
+                        <div class="unit">份 · ⚠ 待处理</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">学生平均完成率</div>
+                        <div class="value">76%</div>
+                        <div class="unit">↓ 低于目标</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">我的班级数</div>
+                        <div class="value">3</div>
+                        <div class="unit">个班级</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">待通知学生</div>
+                        <div class="value">5</div>
+                        <div class="unit">人 · 未完成</div>
+                    </div>
+                </div>
+
+                <div class="class-cards">
+                    <div class="class-card">
+                        <div class="class-card-header">
+                            <div class="class-card-title">AMC 8 基础班</div>
+                            <div class="class-card-info">18 名学生 · 共 12 节课 · 已完成 4 节</div>
+                        </div>
+                        <div class="class-card-body">
+                            <div class="progress-item">
+                                <div class="progress-label">
+                                    <span>课程进度</span>
+                                    <span>33%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 33%"></div>
+                                </div>
+                            </div>
+                            <div class="progress-item">
+                                <div class="progress-label">
+                                    <span>作业完成率</span>
+                                    <span>78%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 78%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="class-card-footer">
+                            <button onclick="showPage('class-assignments')">查看作业</button>
+                            <button onclick="showPage('publish-task')">发布任务</button>
+                            <button onclick="showPage('analytics')">查看数据</button>
+                        </div>
+                    </div>
+
+                    <div class="class-card">
+                        <div class="class-card-header">
+                            <div class="class-card-title">AMC 8 强化班</div>
+                            <div class="class-card-info">22 名学生 · 共 12 节课 · 已完成 4 节</div>
+                        </div>
+                        <div class="class-card-body">
+                            <div class="progress-item">
+                                <div class="progress-label">
+                                    <span>课程进度</span>
+                                    <span>33%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 33%"></div>
+                                </div>
+                            </div>
+                            <div class="progress-item">
+                                <div class="progress-label">
+                                    <span>作业完成率</span>
+                                    <span>82%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 82%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="class-card-footer">
+                            <button onclick="showPage('class-assignments')">查看作业</button>
+                            <button onclick="showPage('publish-task')">发布任务</button>
+                            <button onclick="showPage('analytics')">查看数据</button>
+                        </div>
+                    </div>
+
+                    <div class="class-card">
+                        <div class="class-card-header">
+                            <div class="class-card-title">AMC 10 冲刺班</div>
+                            <div class="class-card-info">15 名学生 · 共 10 节课 · 开课日期 7月15日</div>
+                        </div>
+                        <div class="class-card-body">
+                            <div class="progress-item">
+                                <div class="progress-label">
+                                    <span>课程进度</span>
+                                    <span>0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div class="progress-item">
+                                <div class="progress-label">
+                                    <span>状态</span>
+                                    <span>待开课</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="class-card-footer">
+                            <button onclick="showPage('publish-task')">准备课件</button>
+                            <button onclick="showPage('publish-task')">下发任务</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="todo-section">
+                    <div class="section-title">待处理事项</div>
+                    <div class="todo-list">
+                        <div class="todo-item">
+                            <div class="todo-content">
+                                <div class="todo-title">AMC 8 基础班 · 第4课作业 待批改</div>
+                                <div class="todo-desc">18 份提交 · 已批改 5 份 · 截止时间 今日 23:59</div>
+                            </div>
+                            <button class="todo-action" onclick="showPage('class-assignments')">立即批改</button>
+                        </div>
+                        <div class="todo-item">
+                            <div class="todo-content">
+                                <div class="todo-title">AMC 8 强化班 · 第4课作业 待批改</div>
+                                <div class="todo-desc">22 份提交 · 已批改 12 份 · 截止时间 明日 23:59</div>
+                            </div>
+                            <button class="todo-action" onclick="showPage('class-assignments')">继续批改</button>
+                        </div>
+                        <div class="todo-item">
+                            <div class="todo-content">
+                                <div class="todo-title">AMC 10 冲刺班 · 第1节课件 待上传</div>
+                                <div class="todo-desc">开课日期 7月15日 · 建议提前3天上传</div>
+                            </div>
+                            <button class="todo-action" onclick="showPage('publish-task')">上传课件</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ai-suggestion">
+                    <div class="ai-suggestion-title">🤖 AI 教学建议</div>
+                    <div class="ai-suggestion-content">
+                        📌 <strong>AMC8基础班 · 第3课代数正确率 52%</strong><br>
+                        建议：本周补发2道代数专项练习题，重点针对方程组解法。
+                    </div>
+                    <button class="ai-suggestion-action" onclick="showPage('publish-task')">查看建议 →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 班级作业管理 -->
+        <div class="page" id="class-assignments">
+            <div class="page-header">
+                <h1>班级作业管理</h1>
+                <p>查看班级学生的作业完成情况，批改作业并发送家长链接</p>
+            </div>
+            <div class="page-body">
+                <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div>
+                            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 5px;">AMC 8 基础班 · 第4课作业</h3>
+                            <p style="color: #6b7280; font-size: 14px;">截止时间: 2026年7月2日 23:59 · 18 名学生 · 已完成 14 份 · 已批改 5 份</p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" onclick="filterAssignments('all')">全部</button>
+                            <button class="btn btn-secondary" onclick="filterAssignments('pending')">待完成</button>
+                            <button class="btn btn-secondary" onclick="filterAssignments('grading')">待批改</button>
+                            <button class="btn btn-secondary" onclick="filterAssignments('graded')">已批改</button>
+                        </div>
+                    </div>
+                    
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+                                    <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">学生名</th>
+                                    <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">学号</th>
+                                    <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">完成状态</th>
+                                    <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">完成时间</th>
+                                    <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">批改状态</th>
+                                    <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">批改时间</th>
+                                    <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e5e7eb;">
+                                    <td style="padding: 12px; font-size: 14px;">张三</td>
+                                    <td style="padding: 12px; font-size: 14px; color: #6b7280;">S001</td>
+                                    <td style="padding: 12px;"><span style="background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-size: 12px;">✓ 已完成</span></td>
+                                    <td style="padding: 12px; font-size: 14px; color: #6b7280;">7月1日 18:30</td>
+                                    <td style="padding: 12px;"><span style="background: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 12px;">⏳ 待批改</span></td>
+                                    <td style="padding: 12px; font-size: 14px; color: #6b7280;">-</td>
+                                    <td style="padding: 12px;">
+                                        <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="showPage('class-assignments')">批改</button>
+                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-left: 5px;" onclick="sendParentLink('张三')">发送链接</button>
+                                    </td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e5e7eb;">
+                                    <td style="padding: 12px; font-size: 14px;">李四</td>
+                                    <td style="padding: 12px; font-size: 14px; color: #6b7280;">S002</td>
+                                    <td style="padding: 12px;"><span style="background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-size: 12px;">✓ 已完成</span></td>
+                                    <td style="padding: 12px; font-size: 14px; color: #6b7280;">7月1日 20:15</td>
+                                    <td style="padding: 12px;"><span style="background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-size: 12px;">✓ 已批改</span></td>
+                                    <td style="padding: 12px; font-size: 14px; color: #6b7280;">7月2日 09:00</td>
+                                    <td style="padding: 12px;">
+                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="sendParentLink('李四')">发送链接</button>
+                                    </td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e5e7eb;">
+                                    <td style="padding: 12px; font-size: 14px;">王五</td>
+                                    <td style="padding: 12px; font-size: 14px; color: #6b7280;">S003</td>
+                                    <td style="padding: 12px;"><span style="background: #fee2e2; color: #7f1d1d; padding: 4px 8px; border-radius: 4px; font-size: 12px;">✗ 未完成</span></td>
+                                    <td style="padding: 12px; font-size: 14px; color: #6b7280;">-</td>
+                                    <td style="padding: 12px;"><span style="background: #f3f4f6; color: #6b7280; padding: 4px 8px; border-radius: 4px; font-size: 12px;">- 未提交</span></td>
+                                    <td style="padding: 12px; font-size: 14px; color: #6b7280;">-</td>
+                                    <td style="padding: 12px;">
+                                        <button class="btn btn-warning" style="padding: 6px 12px; font-size: 12px;" onclick="notifyStudent('王五')">通知学生</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 发布任务 -->
+        <div class="page" id="publish-task">
+            <div class="page-header">
+                <h1>发布任务</h1>
+                <p>创建新任务、选择题目、发布给班级或学生</p>
+            </div>
+            <div class="page-body">
+                <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 30px; margin-bottom: 20px;">
+                    <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">新建任务</h3>
+                    <form onsubmit="handlePublishTask(event)">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">*任务类型</label>
+                                <select style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+                                    <option>作业</option>
+                                    <option>练习题</option>
+                                    <option>测试</option>
+                                    <option>背单词</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">*发布对象</label>
+                                <select style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+                                    <option>整个班级</option>
+                                    <option>部分学生</option>
+                                    <option>单个学生</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">*任务标题</label>
+                            <input type="text" placeholder="例如: AMC 8 第4课作业" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" required>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">描述</label>
+                            <textarea placeholder="任务描述、要求等" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; min-height: 100px;"></textarea>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">*关联课程</label>
+                                <select style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+                                    <option>AMC 8 基础班 - 第4课</option>
+                                    <option>AMC 8 基础班 - 第5课</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">*截止时间</label>
+                                <input type="datetime-local" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" required>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">*选择题目</label>
+                            <div style="border: 1px dashed #d1d5db; border-radius: 6px; padding: 20px; text-align: center; background: #f9fafb;">
+                                <p style="color: #6b7280; margin-bottom: 10px;">从课程库选择题目或上传题目</p>
+                                <button type="button" class="btn btn-secondary" onclick="alert('打开课程库题目选择')">从课程库选题</button>
+                                <button type="button" class="btn btn-secondary" style="margin-left: 10px;" onclick="alert('上传题目')">上传题目</button>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn btn-primary">发布任务</button>
+                            <button type="button" class="btn btn-secondary" onclick="alert('预览任务')">预览</button>
+                            <button type="button" class="btn btn-secondary" onclick="alert('保存草稿')">保存草稿</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px;">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">历史任务</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+                                <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">任务名</th>
+                                <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">发布时间</th>
+                                <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">完成率</th>
+                                <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">状态</th>
+                                <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <td style="padding: 12px; font-size: 14px;">AMC 8 基础班 · 第4课作业</td>
+                                <td style="padding: 12px; font-size: 14px; color: #6b7280;">7月1日 10:00</td>
+                                <td style="padding: 12px;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div style="height: 6px; width: 100px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+                                            <div style="height: 100%; width: 78%; background: #2563eb;"></div>
+                                        </div>
+                                        <span style="font-size: 12px; color: #6b7280;">78%</span>
+                                    </div>
+                                </td>
+                                <td style="padding: 12px;"><span style="background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-size: 12px;">进行中</span></td>
+                                <td style="padding: 12px;">
+                                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="alert('查看详情')">详情</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 学生档案 -->
+        <div class="page" id="student-profile">
+            <div class="page-header">
+                <h1>学生档案</h1>
+                <p>查看学生的学习轨迹、知识点掌握、错题集等信息</p>
+            </div>
+            <div class="page-body">
+                <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div>
+                            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">张三</h3>
+                            <p style="color: #6b7280; font-size: 14px;">学号: S001 · AMC 8 基础班 · 入学: 2026年6月1日</p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-primary" onclick="sendParentLink('张三')">发送家长链接</button>
+                            <button class="btn btn-secondary" onclick="showPage('publish-task')">发送任务</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px;">
+                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">知识点掌握地图</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div style="padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #2563eb;">
+                                <div style="font-size: 14px; font-weight: 500; margin-bottom: 5px;">代数方程</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #2563eb;">78%</div>
+                                <div style="font-size: 12px; color: #6b7280; margin-top: 5px;">掌握较好</div>
+                            </div>
+                            <div style="padding: 15px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                                <div style="font-size: 14px; font-weight: 500; margin-bottom: 5px;">几何图形</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #f59e0b;">52%</div>
+                                <div style="font-size: 12px; color: #6b7280; margin-top: 5px;">需要加强</div>
+                            </div>
+                            <div style="padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #2563eb;">
+                                <div style="font-size: 14px; font-weight: 500; margin-bottom: 5px;">数论整数</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #2563eb;">85%</div>
+                                <div style="font-size: 12px; color: #6b7280; margin-top: 5px;">掌握很好</div>
+                            </div>
+                            <div style="padding: 15px; background: #fee2e2; border-radius: 8px; border-left: 4px solid #ef4444;">
+                                <div style="font-size: 14px; font-weight: 500; margin-bottom: 5px;">概率统计</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #ef4444;">38%</div>
+                                <div style="font-size: 12px; color: #6b7280; margin-top: 5px;">急需补强</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px;">
+                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">学习统计</h4>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px;">
+                                    <span>作业完成率</span>
+                                    <span style="font-weight: 600;">82%</span>
+                                </div>
+                                <div style="height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+                                    <div style="height: 100%; width: 82%; background: #10b981;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px;">
+                                    <span>平均分</span>
+                                    <span style="font-weight: 600;">76 分</span>
+                                </div>
+                                <div style="height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+                                    <div style="height: 100%; width: 76%; background: #2563eb;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px;">
+                                    <span>错题数</span>
+                                    <span style="font-weight: 600;">12 道</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px;">
+                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">错题集</h4>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="padding: 12px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #ef4444;">
+                            <div style="font-size: 13px; font-weight: 500; margin-bottom: 3px;">第4课 · 代数方程组 · 第3题</div>
+                            <div style="font-size: 12px; color: #6b7280;">学生答案错误 · 7月1日</div>
+                        </div>
+                        <div style="padding: 12px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                            <div style="font-size: 13px; font-weight: 500; margin-bottom: 3px;">第3课 · 几何图形 · 第5题</div>
+                            <div style="font-size: 12px; color: #6b7280;">知识点掌握不足 · 6月28日</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 消息中心 -->
+        <div class="page" id="messages">
+            <div class="page-header">
+                <h1>消息中心</h1>
+                <p>查看学生反馈、家长反馈、系统通知</p>
+            </div>
+            <div class="page-body">
+                <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px;">
+                        <button class="btn btn-primary" onclick="filterMessages('all')">全部消息</button>
+                        <button class="btn btn-secondary" onclick="filterMessages('student')">学生反馈</button>
+                        <button class="btn btn-secondary" onclick="filterMessages('parent')">家长反馈</button>
+                        <button class="btn btn-secondary" onclick="filterMessages('system')">系统通知</button>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div style="padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #2563eb; cursor: pointer;" onclick="alert('打开消息详情')">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 500;">张三 · 学生反馈</div>
+                                    <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">第4课作业第3题不太理解，能帮我讲解一下吗？</div>
+                                </div>
+                                <span style="background: #2563eb; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">未读</span>
+                            </div>
+                            <div style="font-size: 12px; color: #9ca3af;">7月2日 14:30</div>
+                        </div>
+
+                        <div style="padding: 15px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #6b7280; cursor: pointer;" onclick="alert('打开消息详情')">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 500;">李四的家长 · 家长反馈</div>
+                                    <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">孩子最近作业完成率有所下降，是否需要调整学习计划？</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 12px; color: #9ca3af;">7月1日 19:00</div>
+                        </div>
+
+                        <div style="padding: 15px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #f59e0b; cursor: pointer;" onclick="alert('打开消息详情')">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 500;">系统通知</div>
+                                    <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">AMC 10 冲刺班将于7月15日开课，请提前3天上传课件</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 12px; color: #9ca3af;">7月1日 09:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 课程库 -->
+        <div class="page" id="course-library">
+            <div class="page-header">
+                <h1>课程库</h1>
+                <p>查看课程、课次、配套题目，快速发布作业</p>
+            </div>
+            <div class="page-body">
+                <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px; margin-bottom: 20px;">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">AMC 8 基础班</h3>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="padding: 15px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #2563eb; cursor: pointer;" onclick="alert('展开课次详情')">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 500;">第4课 · 代数方程组</div>
+                                    <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">配套题目: 8道 · 知识点: 3个</div>
+                                </div>
+                                <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;" onclick="showPage('publish-task')">快速发布</button>
+                            </div>
+                        </div>
+                        <div style="padding: 15px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #2563eb; cursor: pointer;" onclick="alert('展开课次详情')">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 500;">第5课 · 几何图形</div>
+                                    <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">配套题目: 10道 · 知识点: 4个</div>
+                                </div>
+                                <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;" onclick="showPage('publish-task')">快速发布</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px;">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">AMC 8 强化班</h3>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="padding: 15px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #2563eb; cursor: pointer;" onclick="alert('展开课次详情')">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 500;">第4课 · 代数方程组（强化版）</div>
+                                    <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">配套题目: 12道 · 知识点: 4个</div>
+                                </div>
+                                <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;" onclick="showPage('publish-task')">快速发布</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据分析 -->
+        <div class="page" id="analytics">
+            <div class="page-header">
+                <h1>数据分析</h1>
+                <p>查看批改进度、群体分析、工作日志</p>
+            </div>
+            <div class="page-body">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px;">
+                        <div style="color: #6b7280; font-size: 14px; margin-bottom: 10px;">本周批改数</div>
+                        <div style="font-size: 32px; font-weight: 700; color: #1f2937; margin-bottom: 5px;">28</div>
+                        <div style="font-size: 12px; color: #9ca3af;">↑ 比上周增加 5 份</div>
+                    </div>
+                    <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px;">
+                        <div style="color: #6b7280; font-size: 14px; margin-bottom: 10px;">平均批改时间</div>
+                        <div style="font-size: 32px; font-weight: 700; color: #1f2937; margin-bottom: 5px;">12 分钟</div>
+                        <div style="font-size: 12px; color: #9ca3af;">效率持续提升</div>
+                    </div>
+                    <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px;">
+                        <div style="color: #6b7280; font-size: 14px; margin-bottom: 10px;">批改完成率</div>
+                        <div style="font-size: 32px; font-weight: 700; color: #1f2937; margin-bottom: 5px;">85%</div>
+                        <div style="font-size: 12px; color: #9ca3af;">3 份待批改</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px;">
+                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">班级批改进度</h4>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px;">
+                                    <span>AMC 8 基础班</span>
+                                    <span style="font-weight: 600;">5/18</span>
+                                </div>
+                                <div style="height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+                                    <div style="height: 100%; width: 28%; background: #2563eb;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 13px;">
+                                    <span>AMC 8 强化班</span>
+                                    <span style="font-weight: 600;">12/22</span>
+                                </div>
+                                <div style="height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+                                    <div style="height: 100%; width: 55%; background: #2563eb;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px;">
+                        <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">工作日志</h4>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <div style="padding: 10px; background: #f9fafb; border-radius: 6px;">
+                                <div style="font-size: 13px; font-weight: 500; margin-bottom: 3px;">7月2日 (今天)</div>
+                                <div style="font-size: 12px; color: #6b7280;">批改: 5份 · 发布任务: 1个 · 发送链接: 3个</div>
+                            </div>
+                            <div style="padding: 10px; background: #f9fafb; border-radius: 6px;">
+                                <div style="font-size: 13px; font-weight: 500; margin-bottom: 3px;">7月1日</div>
+                                <div style="font-size: 12px; color: #6b7280;">批改: 8份 · 发布任务: 2个 · 发送链接: 5个</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px;">
+                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">群体分析 · 知识点掌握率</h4>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <div style="padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #2563eb;">
+                            <div style="font-size: 14px; font-weight: 500; margin-bottom: 5px;">代数方程</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #2563eb;">72%</div>
+                            <div style="font-size: 12px; color: #6b7280; margin-top: 5px;">18 名学生</div>
+                        </div>
+                        <div style="padding: 15px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                            <div style="font-size: 14px; font-weight: 500; margin-bottom: 5px;">几何图形</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #f59e0b;">58%</div>
+                            <div style="font-size: 12px; color: #6b7280; margin-top: 5px;">18 名学生</div>
+                        </div>
+                        <div style="padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #2563eb;">
+                            <div style="font-size: 14px; font-weight: 500; margin-bottom: 5px;">数论整数</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #2563eb;">81%</div>
+                            <div style="font-size: 12px; color: #6b7280; margin-top: 5px;">18 名学生</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 班级公告 -->
+        <div class="page" id="announcements">
+            <div class="page-header">
+                <h1>班级公告</h1>
+                <p>发布班级通知、查看阅读情况</p>
+            </div>
+            <div class="page-body">
+                <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 30px; margin-bottom: 20px;">
+                    <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">发布新公告</h3>
+                    <form onsubmit="handlePublishAnnouncement(event)">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">*公告标题</label>
+                            <input type="text" placeholder="例如: 本周重点复习代数方程" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;" required>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">*公告内容</label>
+                            <textarea placeholder="公告详细内容" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; min-height: 120px;" required></textarea>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">发布对象</label>
+                                <select style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+                                    <option>全体学生和家长</option>
+                                    <option>仅学生</option>
+                                    <option>仅家长</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">
+                                    <input type="checkbox" style="margin-right: 5px;"> 置顶公告
+                                </label>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn btn-primary">发布公告</button>
+                            <button type="button" class="btn btn-secondary" onclick="alert('预览公告')">预览</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px;">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">公告列表</h3>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div style="padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #2563eb; cursor: pointer;" onclick="alert('查看公告详情')">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 600;">📌 本周重点复习代数方程</div>
+                                    <div style="font-size: 13px; color: #6b7280; margin-top: 5px;">本周将重点复习代数方程的解法，建议学生完成配套练习题...</div>
+                                </div>
+                                <span style="background: #2563eb; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">置顶</span>
+                            </div>
+                            <div style="font-size: 12px; color: #9ca3af;">7月2日 10:00 · 阅读: 18/18 (100%)</div>
+                        </div>
+
+                        <div style="padding: 15px; background: #f9fafb; border-radius: 8px; border-left: 4px solid #6b7280; cursor: pointer;" onclick="alert('查看公告详情')">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                <div>
+                                    <div style="font-size: 14px; font-weight: 600;">下周课程安排调整</div>
+                                    <div style="font-size: 13px; color: #6b7280; margin-top: 5px;">由于讲师日程调整，下周第5课将延期至下下周进行...</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 12px; color: #9ca3af;">7月1日 14:30 · 阅读: 16/18 (89%)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 家长沟通 -->
+        <div class="page" id="parent-communication">
+            <div class="page-header">
+                <h1>家长沟通</h1>
+                <p>发送学生学习链接、查看沟通记录</p>
+            </div>
+            <div class="page-body">
+                <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px; margin-bottom: 20px;">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">发送学习链接</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">*选择学生</label>
+                            <select style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+                                <option>张三</option>
+                                <option>李四</option>
+                                <option>王五</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;">*链接有效期</label>
+                            <select style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;">
+                                <option>7 天</option>
+                                <option>30 天</option>
+                                <option>永久有效</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding: 12px; background: #f0f9ff; border-radius: 6px; border: 1px solid #bfdbfe;">
+                        <div style="font-size: 13px; color: #1e40af; margin-bottom: 8px;">📋 生成的链接:</div>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" value="https://lingxi.reknow.com/student/profile/s001?token=abc123" readonly style="flex: 1; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px; background: white;">
+                            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;" onclick="alert('已复制到剪贴板')">复制</button>
+                            <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 13px;" onclick="alert('分享到微信')">分享</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px;">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 15px;">发送记录</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+                                <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">学生名</th>
+                                <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">发送时间</th>
+                                <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">链接状态</th>
+                                <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">家长反馈</th>
+                                <th style="padding: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #6b7280;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <td style="padding: 12px; font-size: 14px;">张三</td>
+                                <td style="padding: 12px; font-size: 14px; color: #6b7280;">7月2日 10:00</td>
+                                <td style="padding: 12px;"><span style="background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-size: 12px;">✓ 已打开</span></td>
+                                <td style="padding: 12px; font-size: 14px; color: #6b7280;">孩子进度不错</td>
+                                <td style="padding: 12px;">
+                                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="alert('查看详情')">详情</button>
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <td style="padding: 12px; font-size: 14px;">李四</td>
+                                <td style="padding: 12px; font-size: 14px; color: #6b7280;">7月1日 15:30</td>
+                                <td style="padding: 12px;"><span style="background: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 12px;">⏳ 未打开</span></td>
+                                <td style="padding: 12px; font-size: 14px; color: #6b7280;">-</td>
+                                <td style="padding: 12px;">
+                                    <button class="btn btn-warning" style="padding: 6px 12px; font-size: 12px;" onclick="alert('重新发送')">重新发送</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 登录处理
+    function handleLogin(event) {
+        event.preventDefault();
+        const id = document.getElementById('login-id').value;
+        const pwd = document.getElementById('login-pwd').value;
+
+        if (id && pwd) {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('appContainer').classList.add('active');
+            localStorage.setItem('assistantLogin', JSON.stringify({ id, pwd, timestamp: Date.now() }));
+        }
+    }
+
+    // 页面切换
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+
+        // 更新导航菜单激活状态
+        document.querySelectorAll('.navbar-menu button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+    }
+
+    // 标签页切换
+    function switchTab(index) {
+        document.querySelectorAll('.form-tab').forEach((tab, i) => {
+            tab.classList.toggle('active', i === index);
+        });
+    }
+
+    // 班级选择
+    function changeClass() {
+        const selector = document.getElementById('classSelector');
+        console.log('班级已切换:', selector.value);
+    }
+
+    // 用户菜单
+    function toggleUserMenu() {
+        console.log('用户菜单');
+    }
+
+    // 页面加载时检查登录状态
+    window.addEventListener('load', () => {
+        const login = localStorage.getItem('assistantLogin');
+        if (login) {
+            const { timestamp } = JSON.parse(login);
+            const now = Date.now();
+            const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+
+            if (now - timestamp < sevenDaysMs) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('appContainer').classList.add('active');
+            }
+        }
+    });
+
+    // 过滤作业
+    function filterAssignments(status) {
+        console.log('筛选作业:', status);
+    }
+
+    // 发送家长链接
+    function sendParentLink(studentName) {
+        alert(`已生成 ${studentName} 的学习链接，可复制分享给家长`);
+    }
+
+    // 通知学生
+    function notifyStudent(studentName) {
+        alert(`已发送通知给 ${studentName}，提醒其尽快完成作业`);
+    }
+
+    // 过滤消息
+    function filterMessages(type) {
+        console.log('筛选消息:', type);
+    }
+
+    // 发布任务
+    function handlePublishTask(event) {
+        event.preventDefault();
+        alert('任务已发布！');
+    }
+
+    // 发布公告
+    function handlePublishAnnouncement(event) {
+        event.preventDefault();
+        alert('公告已发布！');
+    }
+
+</script>
+
+</body>
+</html>
